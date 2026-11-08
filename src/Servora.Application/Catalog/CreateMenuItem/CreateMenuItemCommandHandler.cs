@@ -6,24 +6,16 @@ using Servora.Domain.Models;
 
 namespace Servora.Application.Catalog.CreateMenuItem;
 
-public sealed class CreateMenuItemCommandHandler : IRequestHandler<CreateMenuItemCommand, Guid>
+public sealed class CreateMenuItemCommandHandler(
+    IMapper mapper,
+    IAppCache cache,
+    IRepository<Branch> branches,
+    IMenuItemRepository menuItems) : IRequestHandler<CreateMenuItemCommand, Guid>
 {
-    private readonly IMapper _mapper;
-    private readonly IAppCache _cache;
-    private readonly IRepository<Branch> _branches;
-    private readonly IMenuItemRepository _menuItems;
-
-    public CreateMenuItemCommandHandler(
-        IMapper mapper,
-        IAppCache cache,
-        IRepository<Branch> branches,
-        IMenuItemRepository menuItems)
-    {
-        _mapper = mapper;
-        _cache = cache;
-        _branches = branches;
-        _menuItems = menuItems;
-    }
+    private readonly IMapper _mapper = mapper;
+    private readonly IAppCache _cache = cache;
+    private readonly IRepository<Branch> _branches = branches;
+    private readonly IMenuItemRepository _menuItems = menuItems;
 
     public async Task<Guid> Handle(CreateMenuItemCommand request, CancellationToken cancellationToken)
     {

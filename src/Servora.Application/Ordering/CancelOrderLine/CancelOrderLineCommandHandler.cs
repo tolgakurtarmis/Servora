@@ -6,24 +6,16 @@ using Servora.Domain.Models;
 
 namespace Servora.Application.Ordering.CancelOrderLine;
 
-public sealed class CancelOrderLineCommandHandler : IRequestHandler<CancelOrderLineCommand, Guid>
+public sealed class CancelOrderLineCommandHandler(
+    IOrderLineRepository lines,
+    IRepository<OrderRound> rounds,
+    ITableSessionRepository sessions,
+    IBranchRealtime realtime) : IRequestHandler<CancelOrderLineCommand, Guid>
 {
-    private readonly IOrderLineRepository _lines;
-    private readonly IRepository<OrderRound> _rounds;
-    private readonly ITableSessionRepository _sessions;
-    private readonly IBranchRealtime _realtime;
-
-    public CancelOrderLineCommandHandler(
-        IOrderLineRepository lines,
-        IRepository<OrderRound> rounds,
-        ITableSessionRepository sessions,
-        IBranchRealtime realtime)
-    {
-        _lines = lines;
-        _rounds = rounds;
-        _sessions = sessions;
-        _realtime = realtime;
-    }
+    private readonly IOrderLineRepository _lines = lines;
+    private readonly IRepository<OrderRound> _rounds = rounds;
+    private readonly ITableSessionRepository _sessions = sessions;
+    private readonly IBranchRealtime _realtime = realtime;
 
     public async Task<Guid> Handle(CancelOrderLineCommand request, CancellationToken cancellationToken)
     {
@@ -33,17 +25,9 @@ public sealed class CancelOrderLineCommandHandler : IRequestHandler<CancelOrderL
             throw new NotFoundException("Order line was not found.");
         }
 
-        var round = await _rounds.GetByIdReadOnlyAsync(line.OrderRoundId, cancellationToken);
-        if (round is null)
-        {
-            throw new NotFoundException("Order round was not found.");
-        }
+        var round = await _rounds.GetByIdReadOnlyAsync(line.OrderRoundId, cancellationToken) ?? throw new NotFoundException("Order round was not found.");
 
-        var session = await _sessions.GetByIdReadOnlyAsync(round.TableSessionId, cancellationToken);
-        if (session is null)
-        {
-            throw new NotFoundException("Table session was not found.");
-        }
+        var session = await _sessions.GetByIdReadOnlyAsync(round.TableSessionId, cancellationToken) ?? throw new NotFoundException("Table session was not found.");
 
         if (session.Status != TableSessionStatus.Open)
         {

@@ -4,16 +4,10 @@ using Servora.Application.Abstractions.Exceptions;
 
 namespace Servora.Application.Catalog.DeleteMenuItem;
 
-public sealed class DeleteMenuItemCommandHandler : IRequestHandler<DeleteMenuItemCommand, Guid>
+public sealed class DeleteMenuItemCommandHandler(IAppCache cache, IMenuItemRepository menuItems) : IRequestHandler<DeleteMenuItemCommand, Guid>
 {
-    private readonly IAppCache _cache;
-    private readonly IMenuItemRepository _menuItems;
-
-    public DeleteMenuItemCommandHandler(IAppCache cache, IMenuItemRepository menuItems)
-    {
-        _cache = cache;
-        _menuItems = menuItems;
-    }
+    private readonly IAppCache _cache = cache;
+    private readonly IMenuItemRepository _menuItems = menuItems;
 
     public async Task<Guid> Handle(DeleteMenuItemCommand request, CancellationToken cancellationToken)
     {

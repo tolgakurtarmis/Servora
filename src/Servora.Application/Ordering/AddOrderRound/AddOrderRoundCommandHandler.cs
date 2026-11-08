@@ -6,27 +6,18 @@ using Servora.Domain.Models;
 
 namespace Servora.Application.Ordering.AddOrderRound;
 
-public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundCommand, Guid>
+public sealed class AddOrderRoundCommandHandler(
+    ITableSessionRepository sessions,
+    ICachedBranchReader branches,
+    IRepository<MenuItem> menuItems,
+    IRepository<OrderRound> rounds,
+    IBranchRealtime realtime) : IRequestHandler<AddOrderRoundCommand, Guid>
 {
-    private readonly ITableSessionRepository _sessions;
-    private readonly ICachedBranchReader _branches;
-    private readonly IRepository<MenuItem> _menuItems;
-    private readonly IRepository<OrderRound> _rounds;
-    private readonly IBranchRealtime _realtime;
-
-    public AddOrderRoundCommandHandler(
-        ITableSessionRepository sessions,
-        ICachedBranchReader branches,
-        IRepository<MenuItem> menuItems,
-        IRepository<OrderRound> rounds,
-        IBranchRealtime realtime)
-    {
-        _sessions = sessions;
-        _branches = branches;
-        _menuItems = menuItems;
-        _rounds = rounds;
-        _realtime = realtime;
-    }
+    private readonly ITableSessionRepository _sessions = sessions;
+    private readonly ICachedBranchReader _branches = branches;
+    private readonly IRepository<MenuItem> _menuItems = menuItems;
+    private readonly IRepository<OrderRound> _rounds = rounds;
+    private readonly IBranchRealtime _realtime = realtime;
 
     public async Task<Guid> Handle(AddOrderRoundCommand request, CancellationToken cancellationToken)
     {
@@ -41,11 +32,7 @@ public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundC
             throw new BusinessException("Orders can only be added to an open table session.");
         }
 
-        var branch = await _branches.GetAsync(session.BranchId, cancellationToken);
-        if (branch is null)
-        {
-            throw new NotFoundException("Branch was not found.");
-        }
+        var branch = await _branches.GetAsync(session.BranchId, cancellationToken) ?? throw new NotFoundException("Branch was not found.");
 
         var kitchenStatus = branch.UsesKitchen ? KitchenStatus.Pending : KitchenStatus.Ready;
 

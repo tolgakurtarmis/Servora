@@ -28,17 +28,9 @@ public sealed class CreateBranchCommandHandler : IRequestHandler<CreateBranchCom
 
     public async Task<Guid> Handle(CreateBranchCommand request, CancellationToken cancellationToken)
     {
-        var tenant = await _tenants.GetByIdReadOnlyAsync(request.TenantId, cancellationToken);
-        if (tenant is null)
-        {
-            throw new NotFoundException("Tenant was not found.");
-        }
+        var tenant = await _tenants.GetByIdReadOnlyAsync(request.TenantId, cancellationToken) ?? throw new NotFoundException("Tenant was not found.");
 
-        var subscription = await _subscriptions.GetByTenantIdAsync(request.TenantId, cancellationToken);
-        if (subscription is null)
-        {
-            throw new NotFoundException("Subscription was not found.");
-        }
+        var subscription = await _subscriptions.GetByTenantIdAsync(request.TenantId, cancellationToken) ?? throw new NotFoundException("Subscription was not found.");
 
         if (subscription.Status is SubscriptionStatus.PastDue or SubscriptionStatus.Suspended)
         {

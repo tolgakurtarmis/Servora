@@ -4,16 +4,10 @@ using Servora.Application.Abstractions.Exceptions;
 
 namespace Servora.Application.Branches.UpdateBranch;
 
-public sealed class UpdateBranchCommandHandler : IRequestHandler<UpdateBranchCommand, Guid>
+public sealed class UpdateBranchCommandHandler(IAppCache cache, IBranchRepository branches) : IRequestHandler<UpdateBranchCommand, Guid>
 {
-    private readonly IAppCache _cache;
-    private readonly IBranchRepository _branches;
-
-    public UpdateBranchCommandHandler(IAppCache cache, IBranchRepository branches)
-    {
-        _cache = cache;
-        _branches = branches;
-    }
+    private readonly IAppCache _cache = cache;
+    private readonly IBranchRepository _branches = branches;
 
     public async Task<Guid> Handle(UpdateBranchCommand request, CancellationToken cancellationToken)
     {
