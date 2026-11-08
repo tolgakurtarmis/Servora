@@ -273,6 +273,12 @@ namespace Servora.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
 
+                    b.Property<bool>("UsesKitchen")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("uses_kitchen");
+
                     b.HasKey("Id")
                         .HasName("pk_branches");
 
@@ -357,6 +363,162 @@ namespace Servora.Infrastructure.Persistence.Migrations
                         .HasFilter("\"is_deleted\" = false");
 
                     b.ToTable("menu_items", (string)null);
+                });
+
+            modelBuilder.Entity("Servora.Domain.Models.OrderLine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("branch_id");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("create_by");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_date");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<int>("KitchenStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("kitchen_status");
+
+                    b.Property<Guid>("MenuItemId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("menu_item_id");
+
+                    b.Property<Guid?>("ModifyBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modify_by");
+
+                    b.Property<DateTime?>("ModifyDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modify_date");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("OrderRoundId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_round_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("unit_price");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_lines");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("ix_order_lines_branch_id");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("ix_order_lines_is_deleted");
+
+                    b.HasIndex("MenuItemId")
+                        .HasDatabaseName("ix_order_lines_menu_item_id");
+
+                    b.HasIndex("OrderRoundId")
+                        .HasDatabaseName("ix_order_lines_order_round_id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_order_lines_tenant_id");
+
+                    b.ToTable("order_lines", (string)null);
+                });
+
+            modelBuilder.Entity("Servora.Domain.Models.OrderRound", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("branch_id");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("create_by");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_date");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid?>("ModifyBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modify_by");
+
+                    b.Property<DateTime?>("ModifyDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modify_date");
+
+                    b.Property<Guid>("TableSessionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("table_session_id");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_rounds");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("ix_order_rounds_branch_id");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("ix_order_rounds_is_deleted");
+
+                    b.HasIndex("TableSessionId")
+                        .HasDatabaseName("ix_order_rounds_table_session_id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_order_rounds_tenant_id");
+
+                    b.ToTable("order_rounds", (string)null);
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.Subscription", b =>
@@ -891,6 +1053,61 @@ namespace Servora.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_menu_items_tenants_tenant_id");
                 });
 
+            modelBuilder.Entity("Servora.Domain.Models.OrderLine", b =>
+                {
+                    b.HasOne("Servora.Domain.Models.Branch", null)
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_lines_branches_branch_id");
+
+                    b.HasOne("Servora.Domain.Models.MenuItem", null)
+                        .WithMany()
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_lines_menu_items_menu_item_id");
+
+                    b.HasOne("Servora.Domain.Models.OrderRound", null)
+                        .WithMany("Lines")
+                        .HasForeignKey("OrderRoundId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_lines_order_rounds_order_round_id");
+
+                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_lines_tenants_tenant_id");
+                });
+
+            modelBuilder.Entity("Servora.Domain.Models.OrderRound", b =>
+                {
+                    b.HasOne("Servora.Domain.Models.Branch", null)
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_rounds_branches_branch_id");
+
+                    b.HasOne("Servora.Domain.Models.TableSession", null)
+                        .WithMany()
+                        .HasForeignKey("TableSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_rounds_table_sessions_table_session_id");
+
+                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_order_rounds_tenants_tenant_id");
+                });
+
             modelBuilder.Entity("Servora.Domain.Models.Subscription", b =>
                 {
                     b.HasOne("Servora.Domain.Models.Tenant", null)
@@ -957,6 +1174,11 @@ namespace Servora.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_branches_asp_net_users_user_id");
+                });
+
+            modelBuilder.Entity("Servora.Domain.Models.OrderRound", b =>
+                {
+                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }
