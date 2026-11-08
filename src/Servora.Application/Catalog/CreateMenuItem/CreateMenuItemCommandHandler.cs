@@ -39,7 +39,7 @@ public sealed class CreateMenuItemCommandHandler : IRequestHandler<CreateMenuIte
         }
 
         var name = request.Name.Trim();
-        if (await _menuItems.ExistsByNameAsync(branch.Id, name, cancellationToken))
+        if (await _menuItems.ExistsByNameAsync(branch.Id, name, null, cancellationToken))
         {
             throw new BusinessException("A menu item with this name already exists in the branch.");
         }

@@ -13,10 +13,16 @@ internal sealed class MenuItemRepository : EfRepository<MenuItem>, IMenuItemRepo
         _dbContext = dbContext;
     }
 
-    public Task<bool> ExistsByNameAsync(Guid branchId, string name, CancellationToken cancellationToken)
+    public Task<bool> ExistsByNameAsync(
+        Guid branchId,
+        string name,
+        Guid? excludeId,
+        CancellationToken cancellationToken)
     {
         return _dbContext.MenuItems.AnyAsync(
-            item => item.BranchId == branchId && item.Name == name,
+            item => item.BranchId == branchId
+                && item.Name == name
+                && (excludeId == null || item.Id != excludeId),
             cancellationToken);
     }
 

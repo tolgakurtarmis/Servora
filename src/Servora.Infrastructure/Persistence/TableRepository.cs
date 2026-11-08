@@ -13,10 +13,16 @@ internal sealed class TableRepository : EfRepository<Table>, ITableRepository
         _dbContext = dbContext;
     }
 
-    public Task<bool> ExistsByNameAsync(Guid branchId, string name, CancellationToken cancellationToken)
+    public Task<bool> ExistsByNameAsync(
+        Guid branchId,
+        string name,
+        Guid? excludeId,
+        CancellationToken cancellationToken)
     {
         return _dbContext.Tables.AnyAsync(
-            table => table.BranchId == branchId && table.Name == name,
+            table => table.BranchId == branchId
+                && table.Name == name
+                && (excludeId == null || table.Id != excludeId),
             cancellationToken);
     }
 

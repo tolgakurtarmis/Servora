@@ -1,0 +1,15 @@
+using FluentValidation;
+
+namespace Servora.Application.Catalog.UpdateMenuItem;
+
+public sealed class UpdateMenuItemCommandValidator : AbstractValidator<UpdateMenuItemCommand>
+{
+    public UpdateMenuItemCommandValidator()
+    {
+        RuleFor(command => command.TenantId).NotEmpty();
+        RuleFor(command => command.BranchId).NotEmpty();
+        RuleFor(command => command.MenuItemId).NotEmpty();
+        RuleFor(command => command.Name).NotEmpty().MaximumLength(200);
+        RuleFor(command => command.Price).GreaterThan(0);
+    }
+}

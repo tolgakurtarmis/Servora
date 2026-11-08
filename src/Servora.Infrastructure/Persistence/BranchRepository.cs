@@ -17,4 +17,15 @@ internal sealed class BranchRepository : EfRepository<Branch>, IBranchRepository
     {
         return _dbContext.Branches.CountAsync(branch => branch.TenantId == tenantId, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Branch>> ListByTenantIdAsync(
+        Guid tenantId,
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.Branches
+            .AsNoTracking()
+            .Where(branch => branch.TenantId == tenantId)
+            .OrderBy(branch => branch.Name)
+            .ToListAsync(cancellationToken);
+    }
 }

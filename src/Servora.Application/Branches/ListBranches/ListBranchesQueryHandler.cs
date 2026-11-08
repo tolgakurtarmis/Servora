@@ -1,0 +1,43 @@
+using MediatR;
+using Servora.Application.Abstractions;
+using Servora.Application.Abstractions.Exceptions;
+
+namespace Servora.Application.Branches.ListBranches;
+
+public sealed class ListBranchesQueryHandler : IRequestHandler<ListBranchesQuery, IReadOnlyList<BranchResponse>>
+{
+    private readonly ICurrentTenant _currentTenant;
+    private readonly ITenantRepository _tenants;
+    private readonly IBranchRepository _branches;
+
+    public ListBranchesQueryHandler(
+        ICurrentTenant currentTenant,
+        ITenantRepository tenants,
+        IBranchRepository branches)
+    {
+        _currentTenant = currentTenant;
+        _tenants = tenants;
+        _branches = branches;
+    }
+
+    public async Task<IReadOnlyList<BranchResponse>> Handle(
+        ListBranchesQuery request,
+        CancellationToken cancellationToken)
+    {
+        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
+        {
+            throw new ForbiddenException("You can only list branches for your own tenant.");
+        }
+
+        var tenant = await _tenants.GetByIdAsync(request.TenantId, cancellationToken);
+        if (tenant is null)
+        {
+            throw new NotFoundException("Tenant was not found.");
+        }
+
+        var branches = await _branches.ListByTenantIdAsync(tenant.Id, cancellationToken);
+        return branches
+            .Select(branch => new BranchResponse(branch.Id, branch.Name, branch.UsesKitchen, branch.IsActive))
+            .ToList();
+    }
+}

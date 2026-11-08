@@ -70,6 +70,8 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+        services.AddScoped<ITenantRepository, TenantRepository>();
+        services.AddScoped<IUserQueryRepository, UserQueryRepository>();
         services.AddScoped<IBranchRepository, BranchRepository>();
         services.AddScoped<ITableRepository, TableRepository>();
         services.AddScoped<IMenuItemRepository, MenuItemRepository>();

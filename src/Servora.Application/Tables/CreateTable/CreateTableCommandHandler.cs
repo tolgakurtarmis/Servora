@@ -31,7 +31,7 @@ public sealed class CreateTableCommandHandler : IRequestHandler<CreateTableComma
         }
 
         var name = request.Name.Trim();
-        if (await _tables.ExistsByNameAsync(branch.Id, name, cancellationToken))
+        if (await _tables.ExistsByNameAsync(branch.Id, name, null, cancellationToken))
         {
             throw new BusinessException("A table with this name already exists in the branch.");
         }

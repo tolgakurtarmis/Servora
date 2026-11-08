@@ -3,7 +3,9 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Servora.Application.Catalog.CreateMenuItem;
+using Servora.Application.Catalog.DeleteMenuItem;
 using Servora.Application.Catalog.ListMenuItems;
+using Servora.Application.Catalog.UpdateMenuItem;
 using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
@@ -23,8 +25,7 @@ public sealed class MenuItemsController : BaseController
         Guid branchId,
         CancellationToken cancellationToken)
     {
-        var response = await Sender.Send(new ListMenuItemsQuery(tenantId, branchId), cancellationToken);
-        return Ok(response);
+        return Ok(await Sender.Send(new ListMenuItemsQuery(tenantId, branchId), cancellationToken));
     }
 
     [HttpPost]
@@ -39,7 +40,37 @@ public sealed class MenuItemsController : BaseController
         var menuItemId = await Sender.Send(
             new CreateMenuItemCommand(tenantId, branchId, request.Name, request.Price),
             cancellationToken);
-        var response = new CreateMenuItemResponse(menuItemId);
-        return Created($"/tenants/{tenantId}/branches/{branchId}/menu-items/{menuItemId}", response);
+        return Created(
+            $"/tenants/{tenantId}/branches/{branchId}/menu-items/{menuItemId}",
+            new CreateMenuItemResponse(menuItemId));
+    }
+
+    [HttpPut("{menuItemId:guid}")]
+    [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)}")]
+    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<Guid>> Update(
+        Guid tenantId,
+        Guid branchId,
+        Guid menuItemId,
+        UpdateMenuItemRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await Sender.Send(
+            new UpdateMenuItemCommand(tenantId, branchId, menuItemId, request.Name, request.Price, request.IsActive),
+            cancellationToken);
+        return Ok(id);
+    }
+
+    [HttpDelete("{menuItemId:guid}")]
+    [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)}")]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public async Task<IActionResult> Delete(
+        Guid tenantId,
+        Guid branchId,
+        Guid menuItemId,
+        CancellationToken cancellationToken)
+    {
+        await Sender.Send(new DeleteMenuItemCommand(tenantId, branchId, menuItemId), cancellationToken);
+        return NoContent();
     }
 }

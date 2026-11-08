@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Servora.Application.Ordering.ListOpenTables;
 using Servora.Application.Tables.CreateTable;
+using Servora.Application.Tables.DeleteTable;
 using Servora.Application.Tables.ListTables;
+using Servora.Application.Tables.UpdateTable;
 using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
@@ -24,8 +26,7 @@ public sealed class TablesController : BaseController
         Guid branchId,
         CancellationToken cancellationToken)
     {
-        var response = await Sender.Send(new ListTablesQuery(tenantId, branchId), cancellationToken);
-        return Ok(response);
+        return Ok(await Sender.Send(new ListTablesQuery(tenantId, branchId), cancellationToken));
     }
 
     [HttpGet("open")]
@@ -36,8 +37,7 @@ public sealed class TablesController : BaseController
         Guid branchId,
         CancellationToken cancellationToken)
     {
-        var response = await Sender.Send(new ListOpenTablesQuery(tenantId, branchId), cancellationToken);
-        return Ok(response);
+        return Ok(await Sender.Send(new ListOpenTablesQuery(tenantId, branchId), cancellationToken));
     }
 
     [HttpPost]
@@ -50,7 +50,37 @@ public sealed class TablesController : BaseController
         CancellationToken cancellationToken)
     {
         var tableId = await Sender.Send(new CreateTableCommand(tenantId, branchId, request.Name), cancellationToken);
-        var response = new CreateTableResponse(tableId);
-        return Created($"/tenants/{tenantId}/branches/{branchId}/tables/{tableId}", response);
+        return Created(
+            $"/tenants/{tenantId}/branches/{branchId}/tables/{tableId}",
+            new CreateTableResponse(tableId));
+    }
+
+    [HttpPut("{tableId:guid}")]
+    [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)}")]
+    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<Guid>> Update(
+        Guid tenantId,
+        Guid branchId,
+        Guid tableId,
+        UpdateTableRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await Sender.Send(
+            new UpdateTableCommand(tenantId, branchId, tableId, request.Name, request.IsActive),
+            cancellationToken);
+        return Ok(id);
+    }
+
+    [HttpDelete("{tableId:guid}")]
+    [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)}")]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    public async Task<IActionResult> Delete(
+        Guid tenantId,
+        Guid branchId,
+        Guid tableId,
+        CancellationToken cancellationToken)
+    {
+        await Sender.Send(new DeleteTableCommand(tenantId, branchId, tableId), cancellationToken);
+        return NoContent();
     }
 }
