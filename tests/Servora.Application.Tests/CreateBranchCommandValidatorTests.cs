@@ -9,7 +9,7 @@ public sealed class CreateBranchCommandValidatorTests
     [Fact]
     public async Task Rejects_empty_name()
     {
-        var result = await _validator.ValidateAsync(new CreateBranchCommand(Guid.NewGuid(), ""));
+        var result = await _validator.ValidateAsync(new CreateBranchCommand(Guid.NewGuid(), "", true));
 
         Assert.False(result.IsValid);
     }
@@ -17,7 +17,7 @@ public sealed class CreateBranchCommandValidatorTests
     [Fact]
     public async Task Accepts_a_valid_command()
     {
-        var result = await _validator.ValidateAsync(new CreateBranchCommand(Guid.NewGuid(), "Kadıköy"));
+        var result = await _validator.ValidateAsync(new CreateBranchCommand(Guid.NewGuid(), "Kadıköy", false));
 
         Assert.True(result.IsValid);
     }

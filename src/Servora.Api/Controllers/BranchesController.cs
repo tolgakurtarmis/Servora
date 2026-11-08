@@ -22,7 +22,9 @@ public sealed class BranchesController : BaseController
         CreateBranchRequest request,
         CancellationToken cancellationToken)
     {
-        var branchId = await Sender.Send(new CreateBranchCommand(tenantId, request.Name), cancellationToken);
+        var branchId = await Sender.Send(
+            new CreateBranchCommand(tenantId, request.Name, request.UsesKitchen ?? true),
+            cancellationToken);
         var response = new CreateBranchResponse(branchId);
         return Created($"/tenants/{tenantId}/branches/{branchId}", response);
     }

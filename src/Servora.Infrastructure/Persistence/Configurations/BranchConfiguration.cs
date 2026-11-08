@@ -15,6 +15,10 @@ internal sealed class BranchConfiguration : IEntityTypeConfiguration<Branch>
             .HasMaxLength(200)
             .IsRequired();
 
+        builder.Property(branch => branch.UsesKitchen)
+            .IsRequired()
+            .HasDefaultValue(true);
+
         builder.HasOne<Tenant>()
             .WithMany()
             .HasForeignKey(branch => branch.TenantId)

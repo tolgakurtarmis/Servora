@@ -10,17 +10,20 @@ public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundC
 {
     private readonly ICurrentTenant _currentTenant;
     private readonly ITableSessionRepository _sessions;
+    private readonly IRepository<Branch> _branches;
     private readonly IRepository<MenuItem> _menuItems;
     private readonly IRepository<OrderRound> _rounds;
 
     public AddOrderRoundCommandHandler(
         ICurrentTenant currentTenant,
         ITableSessionRepository sessions,
+        IRepository<Branch> branches,
         IRepository<MenuItem> menuItems,
         IRepository<OrderRound> rounds)
     {
         _currentTenant = currentTenant;
         _sessions = sessions;
+        _branches = branches;
         _menuItems = menuItems;
         _rounds = rounds;
     }
@@ -42,6 +45,14 @@ public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundC
         {
             throw new BusinessException("Orders can only be added to an open table session.");
         }
+
+        var branch = await _branches.GetByIdAsync(session.BranchId, cancellationToken);
+        if (branch is null)
+        {
+            throw new NotFoundException("Branch was not found.");
+        }
+
+        var kitchenStatus = branch.UsesKitchen ? KitchenStatus.Pending : KitchenStatus.Ready;
 
         var round = new OrderRound
         {
@@ -71,7 +82,7 @@ public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundC
                 Name = menuItem.Name,
                 UnitPrice = menuItem.Price,
                 Quantity = line.Sum(item => item.Quantity),
-                KitchenStatus = KitchenStatus.Pending
+                KitchenStatus = kitchenStatus
             });
         }
 
