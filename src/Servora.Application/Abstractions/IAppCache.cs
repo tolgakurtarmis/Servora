@@ -19,6 +19,8 @@ public static class CacheKeys
 {
     public static string Menus(Guid branchId) => $"menus:{branchId:D}";
 
+    public static string Categories(Guid branchId) => $"categories:{branchId:D}";
+
     public static string Tables(Guid branchId) => $"tables:{branchId:D}";
 
     public static string Branch(Guid branchId) => $"branch:{branchId:D}";
@@ -27,6 +29,8 @@ public static class CacheKeys
 public static class CacheDurations
 {
     public static readonly TimeSpan Menus = TimeSpan.FromHours(1);
+
+    public static readonly TimeSpan Categories = TimeSpan.FromHours(1);
 
     public static readonly TimeSpan Tables = TimeSpan.FromHours(1);
 

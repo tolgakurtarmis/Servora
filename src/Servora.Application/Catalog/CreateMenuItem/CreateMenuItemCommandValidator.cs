@@ -12,6 +12,9 @@ public sealed class CreateMenuItemCommandValidator : AbstractValidator<CreateMen
         RuleFor(command => command.BranchId)
             .NotEmpty();
 
+        RuleFor(command => command.CategoryId)
+            .NotEmpty();
+
         RuleFor(command => command.Name)
             .NotEmpty()
             .MaximumLength(200);

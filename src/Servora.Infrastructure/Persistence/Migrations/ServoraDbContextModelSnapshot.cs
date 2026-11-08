@@ -291,6 +291,79 @@ namespace Servora.Infrastructure.Persistence.Migrations
                     b.ToTable("branches", (string)null);
                 });
 
+            modelBuilder.Entity("Servora.Domain.Models.MenuCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("branch_id");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("create_by");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_date");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<Guid?>("ModifyBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modify_by");
+
+                    b.Property<DateTime?>("ModifyDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modify_date");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_menu_categories");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("ix_menu_categories_branch_id");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("ix_menu_categories_is_deleted");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_menu_categories_tenant_id");
+
+                    b.HasIndex("BranchId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_menu_categories_branch_id_name")
+                        .HasFilter("\"is_deleted\" = false");
+
+                    b.ToTable("menu_categories", (string)null);
+                });
+
             modelBuilder.Entity("Servora.Domain.Models.MenuItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -301,6 +374,10 @@ namespace Servora.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("BranchId")
                         .HasColumnType("uuid")
                         .HasColumnName("branch_id");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
 
                     b.Property<Guid?>("CreateBy")
                         .HasColumnType("uuid")
@@ -350,6 +427,9 @@ namespace Servora.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("BranchId")
                         .HasDatabaseName("ix_menu_items_branch_id");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_menu_items_category_id");
 
                     b.HasIndex("IsDeleted")
                         .HasDatabaseName("ix_menu_items_is_deleted");
@@ -1190,6 +1270,27 @@ namespace Servora.Infrastructure.Persistence.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("Servora.Domain.Models.MenuCategory", b =>
+                {
+                    b.HasOne("Servora.Domain.Models.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_menu_categories_branches_branch_id");
+
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_menu_categories_tenants_tenant_id");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Tenant");
+                });
+
             modelBuilder.Entity("Servora.Domain.Models.MenuItem", b =>
                 {
                     b.HasOne("Servora.Domain.Models.Branch", "Branch")
@@ -1199,6 +1300,13 @@ namespace Servora.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_menu_items_branches_branch_id");
 
+                    b.HasOne("Servora.Domain.Models.MenuCategory", "Category")
+                        .WithMany("Items")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_menu_items_menu_categories_category_id");
+
                     b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -1207,6 +1315,8 @@ namespace Servora.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_menu_items_tenants_tenant_id");
 
                     b.Navigation("Branch");
+
+                    b.Navigation("Category");
 
                     b.Navigation("Tenant");
                 });
@@ -1424,6 +1534,11 @@ namespace Servora.Infrastructure.Persistence.Migrations
                     b.Navigation("Tenant");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Servora.Domain.Models.MenuCategory", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.OrderRound", b =>

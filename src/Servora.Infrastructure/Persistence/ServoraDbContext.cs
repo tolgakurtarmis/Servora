@@ -27,6 +27,8 @@ public sealed class ServoraDbContext : IdentityDbContext<User, IdentityRole<Guid
 
     public DbSet<Table> Tables => Set<Table>();
 
+    public DbSet<MenuCategory> MenuCategories => Set<MenuCategory>();
+
     public DbSet<MenuItem> MenuItems => Set<MenuItem>();
 
     public DbSet<TableSession> TableSessions => Set<TableSession>();

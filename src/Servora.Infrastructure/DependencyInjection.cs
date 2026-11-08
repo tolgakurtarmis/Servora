@@ -92,6 +92,7 @@ public static class DependencyInjection
         services.AddScoped<IUserQueryRepository, UserQueryRepository>();
         services.AddScoped<IBranchRepository, BranchRepository>();
         services.AddScoped<ITableRepository, TableRepository>();
+        services.AddScoped<IMenuCategoryRepository, MenuCategoryRepository>();
         services.AddScoped<IMenuItemRepository, MenuItemRepository>();
         services.AddScoped<ITableSessionRepository, TableSessionRepository>();
         services.AddScoped<IOrderLineRepository, OrderLineRepository>();

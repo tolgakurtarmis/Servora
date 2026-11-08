@@ -10,7 +10,7 @@ public sealed class CreateMenuItemCommandValidatorTests
     public async Task Rejects_a_non_positive_price()
     {
         var result = await _validator.ValidateAsync(
-            new CreateMenuItemCommand(Guid.NewGuid(), Guid.NewGuid(), "Latte", 0));
+            new CreateMenuItemCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Latte", 0));
 
         Assert.False(result.IsValid);
     }
@@ -19,7 +19,7 @@ public sealed class CreateMenuItemCommandValidatorTests
     public async Task Accepts_a_valid_command()
     {
         var result = await _validator.ValidateAsync(
-            new CreateMenuItemCommand(Guid.NewGuid(), Guid.NewGuid(), "Latte", 120));
+            new CreateMenuItemCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Latte", 120));
 
         Assert.True(result.IsValid);
     }

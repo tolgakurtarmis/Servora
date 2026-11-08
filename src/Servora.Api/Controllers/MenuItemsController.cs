@@ -38,7 +38,7 @@ public sealed class MenuItemsController : BaseController
         CancellationToken cancellationToken)
     {
         var menuItemId = await Sender.Send(
-            new CreateMenuItemCommand(tenantId, branchId, request.Name, request.Price),
+            new CreateMenuItemCommand(tenantId, branchId, request.CategoryId, request.Name, request.Price),
             cancellationToken);
         return Created(
             $"/tenants/{tenantId}/branches/{branchId}/menu-items/{menuItemId}",
@@ -56,7 +56,14 @@ public sealed class MenuItemsController : BaseController
         CancellationToken cancellationToken)
     {
         var id = await Sender.Send(
-            new UpdateMenuItemCommand(tenantId, branchId, menuItemId, request.Name, request.Price, request.IsActive),
+            new UpdateMenuItemCommand(
+                tenantId,
+                branchId,
+                menuItemId,
+                request.CategoryId,
+                request.Name,
+                request.Price,
+                request.IsActive),
             cancellationToken);
         return Ok(id);
     }

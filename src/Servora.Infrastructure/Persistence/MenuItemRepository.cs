@@ -32,8 +32,11 @@ internal sealed class MenuItemRepository : EfRepository<MenuItem>, IMenuItemRepo
     {
         return await _dbContext.MenuItems
             .AsNoTracking()
+            .Include(item => item.Category)
             .Where(item => item.BranchId == branchId && item.IsActive)
-            .OrderBy(item => item.Name)
+            .OrderBy(item => item.Category.SortOrder)
+            .ThenBy(item => item.Category.Name)
+            .ThenBy(item => item.Name)
             .ToListAsync(cancellationToken);
     }
 }
