@@ -70,6 +70,7 @@ public static class DependencyInjection
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IBranchRepository, BranchRepository>();
         services.AddScoped<ITableRepository, TableRepository>();
+        services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 
         return services;
     }

@@ -27,6 +27,8 @@ public sealed class ServoraDbContext : IdentityDbContext<User, IdentityRole<Guid
 
     public DbSet<Table> Tables => Set<Table>();
 
+    public DbSet<MenuItem> MenuItems => Set<MenuItem>();
+
     public Guid? CurrentTenantId => _currentTenant.TenantId;
 
     public Guid? CurrentBranchId => _currentTenant.BranchId;
