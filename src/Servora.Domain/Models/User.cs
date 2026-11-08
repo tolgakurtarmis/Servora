@@ -10,4 +10,6 @@ public sealed class User : AuditedIdentityUser
     public Role Role { get; set; }
 
     public Guid? TenantId { get; set; }
+
+    public Tenant? Tenant { get; set; }
 }

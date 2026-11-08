@@ -19,12 +19,12 @@ internal sealed class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
             .HasPrecision(18, 2)
             .IsRequired();
 
-        builder.HasOne<Branch>()
+        builder.HasOne(item => item.Branch)
             .WithMany()
             .HasForeignKey(item => item.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Tenant>()
+        builder.HasOne(item => item.Tenant)
             .WithMany()
             .HasForeignKey(item => item.TenantId)
             .OnDelete(DeleteBehavior.Cascade);

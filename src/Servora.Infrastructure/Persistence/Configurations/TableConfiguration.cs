@@ -15,12 +15,12 @@ internal sealed class TableConfiguration : IEntityTypeConfiguration<Table>
             .HasMaxLength(100)
             .IsRequired();
 
-        builder.HasOne<Branch>()
+        builder.HasOne(table => table.Branch)
             .WithMany()
             .HasForeignKey(table => table.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Tenant>()
+        builder.HasOne(table => table.Tenant)
             .WithMany()
             .HasForeignKey(table => table.TenantId)
             .OnDelete(DeleteBehavior.Cascade);

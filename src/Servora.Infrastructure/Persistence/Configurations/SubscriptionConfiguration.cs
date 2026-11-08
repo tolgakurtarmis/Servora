@@ -20,7 +20,7 @@ internal sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Subsc
         builder.Property(subscription => subscription.MaxUsers)
             .IsRequired();
 
-        builder.HasOne<Tenant>()
+        builder.HasOne(subscription => subscription.Tenant)
             .WithMany()
             .HasForeignKey(subscription => subscription.TenantId)
             .OnDelete(DeleteBehavior.Cascade);

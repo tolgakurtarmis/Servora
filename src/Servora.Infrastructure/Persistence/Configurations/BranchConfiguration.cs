@@ -19,7 +19,7 @@ internal sealed class BranchConfiguration : IEntityTypeConfiguration<Branch>
             .IsRequired()
             .HasDefaultValue(true);
 
-        builder.HasOne<Tenant>()
+        builder.HasOne(branch => branch.Tenant)
             .WithMany()
             .HasForeignKey(branch => branch.TenantId)
             .OnDelete(DeleteBehavior.Cascade);

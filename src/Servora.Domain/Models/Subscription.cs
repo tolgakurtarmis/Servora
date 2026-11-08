@@ -8,6 +8,8 @@ public sealed class Subscription : Entity, ITenantEntity
 {
     public Guid TenantId { get; set; }
 
+    public Tenant Tenant { get; set; } = null!;
+
     public SubscriptionStatus Status { get; set; }
 
     public int MaxBranches { get; set; }

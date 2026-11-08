@@ -20,12 +20,12 @@ internal sealed class TableSessionConfiguration : IEntityTypeConfiguration<Table
             .HasForeignKey(session => session.TableId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Branch>()
+        builder.HasOne(session => session.Branch)
             .WithMany()
             .HasForeignKey(session => session.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Tenant>()
+        builder.HasOne(session => session.Tenant)
             .WithMany()
             .HasForeignKey(session => session.TenantId)
             .OnDelete(DeleteBehavior.Cascade);

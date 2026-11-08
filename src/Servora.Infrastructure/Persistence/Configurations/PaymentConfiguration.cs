@@ -18,17 +18,17 @@ internal sealed class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.Property(payment => payment.Method)
             .IsRequired();
 
-        builder.HasOne<TableSession>()
+        builder.HasOne(payment => payment.TableSession)
             .WithMany()
             .HasForeignKey(payment => payment.TableSessionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Branch>()
+        builder.HasOne(payment => payment.Branch)
             .WithMany()
             .HasForeignKey(payment => payment.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Tenant>()
+        builder.HasOne(payment => payment.Tenant)
             .WithMany()
             .HasForeignKey(payment => payment.TenantId)
             .OnDelete(DeleteBehavior.Cascade);

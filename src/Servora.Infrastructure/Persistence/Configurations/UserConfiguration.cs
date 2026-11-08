@@ -25,6 +25,11 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.HasOne(user => user.Tenant)
+            .WithMany()
+            .HasForeignKey(user => user.TenantId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.HasIndex(user => user.TenantId);
         builder.HasIndex(user => user.IsDeleted);
 

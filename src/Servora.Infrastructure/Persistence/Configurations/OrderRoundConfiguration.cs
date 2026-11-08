@@ -11,23 +11,23 @@ internal sealed class OrderRoundConfiguration : IEntityTypeConfiguration<OrderRo
         builder.ToTable("order_rounds");
         builder.ConfigureEntity();
 
-        builder.HasOne<TableSession>()
+        builder.HasOne(round => round.TableSession)
             .WithMany()
             .HasForeignKey(round => round.TableSessionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Branch>()
+        builder.HasOne(round => round.Branch)
             .WithMany()
             .HasForeignKey(round => round.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Tenant>()
+        builder.HasOne(round => round.Tenant)
             .WithMany()
             .HasForeignKey(round => round.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(round => round.Lines)
-            .WithOne()
+            .WithOne(line => line.OrderRound)
             .HasForeignKey(line => line.OrderRoundId)
             .OnDelete(DeleteBehavior.Cascade);
 

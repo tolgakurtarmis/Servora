@@ -11,14 +11,19 @@ internal sealed class UserBranchConfiguration : IEntityTypeConfiguration<UserBra
         builder.ToTable("user_branches");
         builder.ConfigureEntity();
 
-        builder.HasOne<User>()
+        builder.HasOne(membership => membership.User)
             .WithMany()
             .HasForeignKey(membership => membership.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Branch>()
+        builder.HasOne(membership => membership.Branch)
             .WithMany()
             .HasForeignKey(membership => membership.BranchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(membership => membership.Tenant)
+            .WithMany()
+            .HasForeignKey(membership => membership.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(membership => new { membership.UserId, membership.BranchId })

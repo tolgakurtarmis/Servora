@@ -25,17 +25,17 @@ internal sealed class OrderLineConfiguration : IEntityTypeConfiguration<OrderLin
         builder.Property(line => line.KitchenStatus)
             .IsRequired();
 
-        builder.HasOne<MenuItem>()
+        builder.HasOne(line => line.MenuItem)
             .WithMany()
             .HasForeignKey(line => line.MenuItemId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<Branch>()
+        builder.HasOne(line => line.Branch)
             .WithMany()
             .HasForeignKey(line => line.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Tenant>()
+        builder.HasOne(line => line.Tenant)
             .WithMany()
             .HasForeignKey(line => line.TenantId)
             .OnDelete(DeleteBehavior.Cascade);

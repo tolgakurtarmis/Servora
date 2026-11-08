@@ -31,8 +31,6 @@ internal sealed class OrderLineRepository : EfRepository<OrderLine>, IOrderLineR
 
     private IQueryable<OrderLine> LinesBySession(Guid tableSessionId)
     {
-        return _dbContext.OrderLines.Where(line =>
-            _dbContext.OrderRounds.Any(round =>
-                round.Id == line.OrderRoundId && round.TableSessionId == tableSessionId));
+        return _dbContext.OrderLines.Where(line => line.OrderRound.TableSessionId == tableSessionId);
     }
 }
