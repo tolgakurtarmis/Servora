@@ -1,3 +1,7 @@
 namespace Servora.Application.Ordering.TakePayment;
 
-public sealed record TakePaymentResponse(Guid Id, decimal Amount);
+public sealed record TakePaymentResponse(
+    Guid Id,
+    decimal Amount,
+    decimal Remaining,
+    bool SessionClosed);

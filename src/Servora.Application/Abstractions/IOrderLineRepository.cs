@@ -7,6 +7,8 @@ public interface IOrderLineRepository : IRepository<OrderLine>
 {
     Task<decimal> SumBySessionIdAsync(Guid tableSessionId, CancellationToken cancellationToken);
 
+    Task<bool> AnyBySessionIdAsync(Guid tableSessionId, CancellationToken cancellationToken);
+
     Task<IReadOnlyList<OrderLine>> ListBySessionIdAsync(Guid tableSessionId, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<KitchenQueueItemInfo>> ListKitchenQueueByBranchIdAsync(

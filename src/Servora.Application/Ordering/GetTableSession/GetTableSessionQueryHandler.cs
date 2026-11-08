@@ -4,18 +4,14 @@ using Servora.Application.Abstractions.Exceptions;
 
 namespace Servora.Application.Ordering.GetTableSession;
 
-public sealed class GetTableSessionQueryHandler : IRequestHandler<GetTableSessionQuery, TableSessionDetailResponse>
+public sealed class GetTableSessionQueryHandler(
+    ITableSessionRepository sessions,
+    IOrderLineRepository lines,
+    IPaymentRepository payments) : IRequestHandler<GetTableSessionQuery, TableSessionDetailResponse>
 {
-    private readonly ITableSessionRepository _sessions;
-    private readonly IOrderLineRepository _lines;
-
-    public GetTableSessionQueryHandler(
-        ITableSessionRepository sessions,
-        IOrderLineRepository lines)
-    {
-        _sessions = sessions;
-        _lines = lines;
-    }
+    private readonly ITableSessionRepository _sessions = sessions;
+    private readonly IOrderLineRepository _lines = lines;
+    private readonly IPaymentRepository _payments = payments;
 
     public async Task<TableSessionDetailResponse> Handle(
         GetTableSessionQuery request,
@@ -27,8 +23,8 @@ public sealed class GetTableSessionQueryHandler : IRequestHandler<GetTableSessio
             throw new NotFoundException("Table session was not found.");
         }
 
-        var lines = await _lines.ListBySessionIdAsync(session.Id, cancellationToken);
-        var lineResponses = lines
+        var orderLines = await _lines.ListBySessionIdAsync(session.Id, cancellationToken);
+        var lineResponses = orderLines
             .Select(line => new TableSessionLineResponse(
                 line.Id,
                 line.OrderRoundId,
@@ -40,11 +36,21 @@ public sealed class GetTableSessionQueryHandler : IRequestHandler<GetTableSessio
                 line.KitchenStatus))
             .ToList();
 
+        var total = lineResponses.Sum(line => line.LineTotal);
+        var paid = await _payments.SumBySessionIdAsync(session.Id, cancellationToken);
+        var remaining = total - paid;
+        if (remaining < 0)
+        {
+            remaining = 0;
+        }
+
         return new TableSessionDetailResponse(
             session.Id,
             session.TableId,
             session.Status,
-            lineResponses.Sum(line => line.LineTotal),
+            total,
+            paid,
+            remaining,
             lineResponses);
     }
 }

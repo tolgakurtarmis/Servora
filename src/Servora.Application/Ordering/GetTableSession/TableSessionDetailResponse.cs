@@ -7,6 +7,8 @@ public sealed record TableSessionDetailResponse(
     Guid TableId,
     TableSessionStatus Status,
     decimal Total,
+    decimal Paid,
+    decimal Remaining,
     IReadOnlyList<TableSessionLineResponse> Lines);
 
 public sealed record TableSessionLineResponse(

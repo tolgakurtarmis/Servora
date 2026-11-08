@@ -18,5 +18,9 @@ public sealed class TakePaymentCommandValidator : AbstractValidator<TakePaymentC
 
         RuleFor(command => command.Method)
             .IsInEnum();
+
+        RuleFor(command => command.Amount)
+            .GreaterThan(0)
+            .When(command => command.Amount.HasValue);
     }
 }

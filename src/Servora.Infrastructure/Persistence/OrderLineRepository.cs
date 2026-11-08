@@ -20,6 +20,11 @@ internal sealed class OrderLineRepository : EfRepository<OrderLine>, IOrderLineR
             .SumAsync(line => line.UnitPrice * line.Quantity, cancellationToken);
     }
 
+    public Task<bool> AnyBySessionIdAsync(Guid tableSessionId, CancellationToken cancellationToken)
+    {
+        return LinesBySession(tableSessionId).AnyAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<OrderLine>> ListBySessionIdAsync(
         Guid tableSessionId,
         CancellationToken cancellationToken)

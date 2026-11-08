@@ -7,6 +7,11 @@ public sealed record TakePaymentCommand(
     Guid TenantId,
     Guid BranchId,
     Guid TableSessionId,
-    PaymentMethod Method) : ICommand<TakePaymentResult>, ITenantRequest;
+    PaymentMethod Method,
+    decimal? Amount = null) : ICommand<TakePaymentResult>, ITenantRequest;
 
-public sealed record TakePaymentResult(Guid Id, decimal Amount);
+public sealed record TakePaymentResult(
+    Guid Id,
+    decimal Amount,
+    decimal Remaining,
+    bool SessionClosed);

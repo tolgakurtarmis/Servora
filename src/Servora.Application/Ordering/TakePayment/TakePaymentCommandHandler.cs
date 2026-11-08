@@ -9,12 +9,12 @@ namespace Servora.Application.Ordering.TakePayment;
 public sealed class TakePaymentCommandHandler(
     ITableSessionRepository sessions,
     IOrderLineRepository lines,
-    IRepository<Payment> payments,
+    IPaymentRepository payments,
     IBranchRealtime realtime) : IRequestHandler<TakePaymentCommand, TakePaymentResult>
 {
     private readonly ITableSessionRepository _sessions = sessions;
     private readonly IOrderLineRepository _lines = lines;
-    private readonly IRepository<Payment> _payments = payments;
+    private readonly IPaymentRepository _payments = payments;
     private readonly IBranchRealtime _realtime = realtime;
 
     public async Task<TakePaymentResult> Handle(TakePaymentCommand request, CancellationToken cancellationToken)
@@ -30,7 +30,20 @@ public sealed class TakePaymentCommandHandler(
             throw new BusinessException("Payment can only be taken for an open table session.");
         }
 
-        var amount = await _lines.SumBySessionIdAsync(session.Id, cancellationToken);
+        var total = await _lines.SumBySessionIdAsync(session.Id, cancellationToken);
+        var paid = await _payments.SumBySessionIdAsync(session.Id, cancellationToken);
+        var remaining = total - paid;
+        if (remaining <= 0)
+        {
+            throw new BusinessException("This session has no remaining balance to pay.");
+        }
+
+        var amount = request.Amount ?? remaining;
+        if (amount > remaining)
+        {
+            throw new BusinessException("Payment amount exceeds the remaining balance.");
+        }
+
         var payment = new Payment
         {
             TenantId = session.TenantId,
@@ -40,11 +53,20 @@ public sealed class TakePaymentCommandHandler(
             Method = request.Method
         };
 
-        session.Status = TableSessionStatus.Closed;
+        var newRemaining = remaining - amount;
+        var sessionClosed = newRemaining <= 0;
+        if (sessionClosed)
+        {
+            session.Status = TableSessionStatus.Closed;
+        }
+
         await _payments.AddAsync(payment, cancellationToken);
         _realtime.TablesChanged(session.BranchId);
-        _realtime.KitchenQueueChanged(session.BranchId);
+        if (sessionClosed)
+        {
+            _realtime.KitchenQueueChanged(session.BranchId);
+        }
 
-        return new TakePaymentResult(payment.Id, payment.Amount);
+        return new TakePaymentResult(payment.Id, payment.Amount, newRemaining < 0 ? 0 : newRemaining, sessionClosed);
     }
 }

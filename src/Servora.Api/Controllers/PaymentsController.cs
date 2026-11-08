@@ -25,9 +25,13 @@ public sealed class PaymentsController : BaseController
         CancellationToken cancellationToken)
     {
         var result = await Sender.Send(
-            new TakePaymentCommand(tenantId, branchId, sessionId, request.Method),
+            new TakePaymentCommand(tenantId, branchId, sessionId, request.Method, request.Amount),
             cancellationToken);
-        var response = new TakePaymentResponse(result.Id, result.Amount);
+        var response = new TakePaymentResponse(
+            result.Id,
+            result.Amount,
+            result.Remaining,
+            result.SessionClosed);
         return Created(
             $"/tenants/{tenantId}/branches/{branchId}/sessions/{sessionId}/payments/{result.Id}",
             response);
