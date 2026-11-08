@@ -9,28 +9,51 @@ public sealed class UnitOfWorkBehaviorTests
     public async Task Saves_after_command()
     {
         var unitOfWork = new FakeUnitOfWork();
-        var behavior = new UnitOfWorkBehavior<SampleCommand, int>(unitOfWork);
+        var realtime = new FakeBranchRealtime();
+        var behavior = new UnitOfWorkBehavior<SampleCommand, int>(unitOfWork, realtime);
 
         var result = await behavior.Handle(new SampleCommand(), _ => Task.FromResult(7), CancellationToken.None);
 
         Assert.Equal(7, result);
         Assert.Equal(1, unitOfWork.SaveCount);
+        Assert.Equal(1, realtime.FlushCount);
     }
 
     [Fact]
     public async Task Does_not_save_after_query()
     {
         var unitOfWork = new FakeUnitOfWork();
-        var behavior = new UnitOfWorkBehavior<SampleQuery, int>(unitOfWork);
+        var realtime = new FakeBranchRealtime();
+        var behavior = new UnitOfWorkBehavior<SampleQuery, int>(unitOfWork, realtime);
 
         await behavior.Handle(new SampleQuery(), _ => Task.FromResult(3), CancellationToken.None);
 
         Assert.Equal(0, unitOfWork.SaveCount);
+        Assert.Equal(0, realtime.FlushCount);
     }
 
     private sealed record SampleCommand : ICommand<int>;
 
     private sealed record SampleQuery : IQuery<int>;
+
+    private sealed class FakeBranchRealtime : IBranchRealtime
+    {
+        public int FlushCount { get; private set; }
+
+        public void KitchenQueueChanged(Guid branchId)
+        {
+        }
+
+        public void TablesChanged(Guid branchId)
+        {
+        }
+
+        public Task FlushAsync(CancellationToken cancellationToken)
+        {
+            FlushCount++;
+            return Task.CompletedTask;
+        }
+    }
 
     private sealed class FakeUnitOfWork : IUnitOfWork
     {

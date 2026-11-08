@@ -11,15 +11,18 @@ public sealed class TakePaymentCommandHandler : IRequestHandler<TakePaymentComma
     private readonly ITableSessionRepository _sessions;
     private readonly IOrderLineRepository _lines;
     private readonly IRepository<Payment> _payments;
+    private readonly IBranchRealtime _realtime;
 
     public TakePaymentCommandHandler(
         ITableSessionRepository sessions,
         IOrderLineRepository lines,
-        IRepository<Payment> payments)
+        IRepository<Payment> payments,
+        IBranchRealtime realtime)
     {
         _sessions = sessions;
         _lines = lines;
         _payments = payments;
+        _realtime = realtime;
     }
 
     public async Task<TakePaymentResult> Handle(TakePaymentCommand request, CancellationToken cancellationToken)
@@ -47,6 +50,8 @@ public sealed class TakePaymentCommandHandler : IRequestHandler<TakePaymentComma
 
         session.Status = TableSessionStatus.Closed;
         await _payments.AddAsync(payment, cancellationToken);
+        _realtime.TablesChanged(session.BranchId);
+        _realtime.KitchenQueueChanged(session.BranchId);
 
         return new TakePaymentResult(payment.Id, payment.Amount);
     }

@@ -9,13 +9,16 @@ public sealed class UpdateKitchenStatusCommandHandler : IRequestHandler<UpdateKi
 {
     private readonly ICachedBranchReader _branches;
     private readonly IOrderLineRepository _lines;
+    private readonly IBranchRealtime _realtime;
 
     public UpdateKitchenStatusCommandHandler(
         ICachedBranchReader branches,
-        IOrderLineRepository lines)
+        IOrderLineRepository lines,
+        IBranchRealtime realtime)
     {
         _branches = branches;
         _lines = lines;
+        _realtime = realtime;
     }
 
     public async Task<Guid> Handle(UpdateKitchenStatusCommand request, CancellationToken cancellationToken)
@@ -52,6 +55,7 @@ public sealed class UpdateKitchenStatusCommandHandler : IRequestHandler<UpdateKi
         }
 
         line.KitchenStatus = request.Status;
+        _realtime.KitchenQueueChanged(line.BranchId);
         return line.Id;
     }
 }

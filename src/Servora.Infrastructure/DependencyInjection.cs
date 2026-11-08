@@ -63,6 +63,20 @@ public static class DependencyInjection
                     RoleClaimType = "role",//[Authorize(Roles = "...")] hangi claim’e bakacak
                     NameClaimType = JwtRegisteredClaimNames.Sub //User.Identity.Name olarak kullanıcı id (sub) kullanır
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        if (!string.IsNullOrEmpty(accessToken)
+                            && context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         services.AddAuthorization();

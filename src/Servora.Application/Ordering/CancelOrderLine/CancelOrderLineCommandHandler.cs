@@ -11,15 +11,18 @@ public sealed class CancelOrderLineCommandHandler : IRequestHandler<CancelOrderL
     private readonly IOrderLineRepository _lines;
     private readonly IRepository<OrderRound> _rounds;
     private readonly ITableSessionRepository _sessions;
+    private readonly IBranchRealtime _realtime;
 
     public CancelOrderLineCommandHandler(
         IOrderLineRepository lines,
         IRepository<OrderRound> rounds,
-        ITableSessionRepository sessions)
+        ITableSessionRepository sessions,
+        IBranchRealtime realtime)
     {
         _lines = lines;
         _rounds = rounds;
         _sessions = sessions;
+        _realtime = realtime;
     }
 
     public async Task<Guid> Handle(CancelOrderLineCommand request, CancellationToken cancellationToken)
@@ -48,6 +51,7 @@ public sealed class CancelOrderLineCommandHandler : IRequestHandler<CancelOrderL
         }
 
         _lines.Remove(line);
+        _realtime.KitchenQueueChanged(line.BranchId);
         return line.Id;
     }
 }

@@ -12,17 +12,20 @@ public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundC
     private readonly ICachedBranchReader _branches;
     private readonly IRepository<MenuItem> _menuItems;
     private readonly IRepository<OrderRound> _rounds;
+    private readonly IBranchRealtime _realtime;
 
     public AddOrderRoundCommandHandler(
         ITableSessionRepository sessions,
         ICachedBranchReader branches,
         IRepository<MenuItem> menuItems,
-        IRepository<OrderRound> rounds)
+        IRepository<OrderRound> rounds,
+        IBranchRealtime realtime)
     {
         _sessions = sessions;
         _branches = branches;
         _menuItems = menuItems;
         _rounds = rounds;
+        _realtime = realtime;
     }
 
     public async Task<Guid> Handle(AddOrderRoundCommand request, CancellationToken cancellationToken)
@@ -79,6 +82,7 @@ public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundC
         }
 
         await _rounds.AddAsync(round, cancellationToken);
+        _realtime.KitchenQueueChanged(session.BranchId);
         return round.Id;
     }
 }

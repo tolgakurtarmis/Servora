@@ -7,10 +7,12 @@ public sealed class UnitOfWorkBehavior<TRequest, TResponse> : IPipelineBehavior<
     where TRequest : notnull
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IBranchRealtime _realtime;
 
-    public UnitOfWorkBehavior(IUnitOfWork unitOfWork)
+    public UnitOfWorkBehavior(IUnitOfWork unitOfWork, IBranchRealtime realtime)
     {
         _unitOfWork = unitOfWork;
+        _realtime = realtime;
     }
 
     public async Task<TResponse> Handle(
@@ -23,6 +25,7 @@ public sealed class UnitOfWorkBehavior<TRequest, TResponse> : IPipelineBehavior<
         if (request is ICommandBase)
         {
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _realtime.FlushAsync(cancellationToken);
         }
 
         return response;

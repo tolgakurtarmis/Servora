@@ -11,15 +11,18 @@ public sealed class OpenTableSessionCommandHandler : IRequestHandler<OpenTableSe
     private readonly IMapper _mapper;
     private readonly IRepository<Table> _tables;
     private readonly ITableSessionRepository _sessions;
+    private readonly IBranchRealtime _realtime;
 
     public OpenTableSessionCommandHandler(
         IMapper mapper,
         IRepository<Table> tables,
-        ITableSessionRepository sessions)
+        ITableSessionRepository sessions,
+        IBranchRealtime realtime)
     {
         _mapper = mapper;
         _tables = tables;
         _sessions = sessions;
+        _realtime = realtime;
     }
 
     public async Task<Guid> Handle(OpenTableSessionCommand request, CancellationToken cancellationToken)
@@ -37,6 +40,7 @@ public sealed class OpenTableSessionCommandHandler : IRequestHandler<OpenTableSe
 
         var session = _mapper.Map<TableSession>(request);
         await _sessions.AddAsync(session, cancellationToken);
+        _realtime.TablesChanged(table.BranchId);
 
         return session.Id;
     }
