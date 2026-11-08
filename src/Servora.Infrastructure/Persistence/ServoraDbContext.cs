@@ -35,6 +35,8 @@ public sealed class ServoraDbContext : IdentityDbContext<User, IdentityRole<Guid
 
     public DbSet<OrderLine> OrderLines => Set<OrderLine>();
 
+    public DbSet<Payment> Payments => Set<Payment>();
+
     public Guid? CurrentTenantId => _currentTenant.TenantId;
 
     public Guid? CurrentBranchId => _currentTenant.BranchId;

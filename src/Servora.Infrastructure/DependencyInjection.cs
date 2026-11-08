@@ -73,6 +73,7 @@ public static class DependencyInjection
         services.AddScoped<ITableRepository, TableRepository>();
         services.AddScoped<IMenuItemRepository, MenuItemRepository>();
         services.AddScoped<ITableSessionRepository, TableSessionRepository>();
+        services.AddScoped<IOrderLineRepository, OrderLineRepository>();
 
         return services;
     }
