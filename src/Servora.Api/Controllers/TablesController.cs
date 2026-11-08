@@ -2,6 +2,7 @@ using System.Net;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Servora.Application.Ordering.ListOpenTables;
 using Servora.Application.Tables.CreateTable;
 using Servora.Domain.Enums;
 
@@ -12,6 +13,18 @@ public sealed class TablesController : BaseController
 {
     public TablesController(ISender sender) : base(sender)
     {
+    }
+
+    [HttpGet("open")]
+    [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Waiter)},{nameof(Role.Cashier)},{nameof(Role.Kitchen)}")]
+    [ProducesResponseType(typeof(IReadOnlyList<OpenTableResponse>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<IReadOnlyList<OpenTableResponse>>> ListOpen(
+        Guid tenantId,
+        Guid branchId,
+        CancellationToken cancellationToken)
+    {
+        var response = await Sender.Send(new ListOpenTablesQuery(tenantId, branchId), cancellationToken);
+        return Ok(response);
     }
 
     [HttpPost]
