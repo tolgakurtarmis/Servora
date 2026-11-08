@@ -6,23 +6,26 @@ using Servora.Domain.Models;
 
 namespace Servora.Application.Auth.Login;
 
-public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
+public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponse>
 {
     private readonly UserManager<User> _users;
     private readonly IUserBranchRepository _userBranches;
-    private readonly IAccessTokenIssuer _tokens;
+    private readonly IAccessTokenIssuer _accessTokens;
+    private readonly IRefreshTokenService _refreshTokens;
 
     public LoginCommandHandler(
         UserManager<User> users,
         IUserBranchRepository userBranches,
-        IAccessTokenIssuer tokens)
+        IAccessTokenIssuer accessTokens,
+        IRefreshTokenService refreshTokens)
     {
         _users = users;
         _userBranches = userBranches;
-        _tokens = tokens;
+        _accessTokens = accessTokens;
+        _refreshTokens = refreshTokens;
     }
 
-    public async Task<LoginResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var user = await _users.FindByEmailAsync(request.Email);
         var passwordMatches = user is not null && await _users.CheckPasswordAsync(user, request.Password);
@@ -39,7 +42,18 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes
             branchId = membership?.BranchId;
         }
 
-        var token = _tokens.Issue(user.Id, user.Email ?? request.Email, user.Role.ToString(), user.TenantId, branchId);
-        return new LoginResponse(token.Value, token.ExpiresAt);
+        var accessToken = _accessTokens.Issue(
+            user.Id,
+            user.Email ?? request.Email,
+            user.Role.ToString(),
+            user.TenantId,
+            branchId);
+        var refreshToken = await _refreshTokens.IssueAsync(user.Id, cancellationToken);
+
+        return new AuthResponse(
+            accessToken.Value,
+            accessToken.ExpiresAt,
+            refreshToken.Value,
+            refreshToken.ExpiresAt);
     }
 }

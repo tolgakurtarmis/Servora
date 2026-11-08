@@ -64,6 +64,7 @@ public static class DependencyInjection
         services.AddAuthorization();
 
         services.AddScoped<IAccessTokenIssuer, JwtAccessTokenIssuer>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IUserBranchRepository, UserBranchRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -37,6 +37,8 @@ public sealed class ServoraDbContext : IdentityDbContext<User, IdentityRole<Guid
 
     public DbSet<Payment> Payments => Set<Payment>();
 
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     public Guid? CurrentTenantId => _currentTenant.TenantId;
 
     public Guid? CurrentBranchId => _currentTenant.BranchId;
