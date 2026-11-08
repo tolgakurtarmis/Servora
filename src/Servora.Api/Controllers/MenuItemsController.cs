@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Servora.Application.Catalog.CreateMenuItem;
+using Servora.Application.Catalog.ListMenuItems;
 using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
@@ -12,6 +13,18 @@ public sealed class MenuItemsController : BaseController
 {
     public MenuItemsController(ISender sender) : base(sender)
     {
+    }
+
+    [HttpGet]
+    [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Waiter)},{nameof(Role.Cashier)},{nameof(Role.Kitchen)}")]
+    [ProducesResponseType(typeof(IReadOnlyList<MenuItemResponse>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<IReadOnlyList<MenuItemResponse>>> List(
+        Guid tenantId,
+        Guid branchId,
+        CancellationToken cancellationToken)
+    {
+        var response = await Sender.Send(new ListMenuItemsQuery(tenantId, branchId), cancellationToken);
+        return Ok(response);
     }
 
     [HttpPost]
