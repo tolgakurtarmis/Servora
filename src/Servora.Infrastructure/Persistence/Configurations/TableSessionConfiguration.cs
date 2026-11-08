@@ -15,7 +15,7 @@ internal sealed class TableSessionConfiguration : IEntityTypeConfiguration<Table
         builder.Property(session => session.Status)
             .IsRequired();
 
-        builder.HasOne<Table>()
+        builder.HasOne(session => session.Table)
             .WithMany()
             .HasForeignKey(session => session.TableId)
             .OnDelete(DeleteBehavior.Cascade);

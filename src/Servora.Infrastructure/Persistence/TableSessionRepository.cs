@@ -25,12 +25,19 @@ internal sealed class TableSessionRepository : EfRepository<TableSession>, ITabl
         Guid branchId,
         CancellationToken cancellationToken)
     {
-        return await (
-            from session in _dbContext.TableSessions
-            join table in _dbContext.Tables on session.TableId equals table.Id
-            where session.BranchId == branchId && session.Status == TableSessionStatus.Open
-            orderby table.Name
-            select new OpenTableSessionInfo(table.Id, table.Name, session.Id, session.CreateDate)
-        ).ToListAsync(cancellationToken);
+        var sessions = await _dbContext.TableSessions
+            .AsNoTracking()
+            .Include(session => session.Table)
+            .Where(session => session.BranchId == branchId && session.Status == TableSessionStatus.Open)
+            .OrderBy(session => session.Table.Name)
+            .ToListAsync(cancellationToken);
+
+        return sessions
+            .Select(session => new OpenTableSessionInfo(
+                session.Table.Id,
+                session.Table.Name,
+                session.Id,
+                session.CreateDate))
+            .ToList();
     }
 }
