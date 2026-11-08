@@ -1037,6 +1037,9 @@ namespace Servora.Infrastructure.Persistence.Migrations
                     b.HasIndex("IsDeleted")
                         .HasDatabaseName("ix_user_branches_is_deleted");
 
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_user_branches_tenant_id");
+
                     b.HasIndex("UserId", "BranchId")
                         .IsUnique()
                         .HasDatabaseName("ix_user_branches_user_id_branch_id")
@@ -1104,176 +1107,238 @@ namespace Servora.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Servora.Domain.Models.Branch", b =>
                 {
-                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_branches_tenants_tenant_id");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.MenuItem", b =>
                 {
-                    b.HasOne("Servora.Domain.Models.Branch", null)
+                    b.HasOne("Servora.Domain.Models.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_menu_items_branches_branch_id");
 
-                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_menu_items_tenants_tenant_id");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.OrderLine", b =>
                 {
-                    b.HasOne("Servora.Domain.Models.Branch", null)
+                    b.HasOne("Servora.Domain.Models.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_order_lines_branches_branch_id");
 
-                    b.HasOne("Servora.Domain.Models.MenuItem", null)
+                    b.HasOne("Servora.Domain.Models.MenuItem", "MenuItem")
                         .WithMany()
                         .HasForeignKey("MenuItemId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_order_lines_menu_items_menu_item_id");
 
-                    b.HasOne("Servora.Domain.Models.OrderRound", null)
+                    b.HasOne("Servora.Domain.Models.OrderRound", "OrderRound")
                         .WithMany("Lines")
                         .HasForeignKey("OrderRoundId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_order_lines_order_rounds_order_round_id");
 
-                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_order_lines_tenants_tenant_id");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("MenuItem");
+
+                    b.Navigation("OrderRound");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.OrderRound", b =>
                 {
-                    b.HasOne("Servora.Domain.Models.Branch", null)
+                    b.HasOne("Servora.Domain.Models.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_order_rounds_branches_branch_id");
 
-                    b.HasOne("Servora.Domain.Models.TableSession", null)
+                    b.HasOne("Servora.Domain.Models.TableSession", "TableSession")
                         .WithMany()
                         .HasForeignKey("TableSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_order_rounds_table_sessions_table_session_id");
 
-                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_order_rounds_tenants_tenant_id");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("TableSession");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.Payment", b =>
                 {
-                    b.HasOne("Servora.Domain.Models.Branch", null)
+                    b.HasOne("Servora.Domain.Models.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_payments_branches_branch_id");
 
-                    b.HasOne("Servora.Domain.Models.TableSession", null)
+                    b.HasOne("Servora.Domain.Models.TableSession", "TableSession")
                         .WithMany()
                         .HasForeignKey("TableSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_payments_table_sessions_table_session_id");
 
-                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_payments_tenants_tenant_id");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("TableSession");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.Subscription", b =>
                 {
-                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_subscriptions_tenants_tenant_id");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.Table", b =>
                 {
-                    b.HasOne("Servora.Domain.Models.Branch", null)
+                    b.HasOne("Servora.Domain.Models.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_tables_branches_branch_id");
 
-                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_tables_tenants_tenant_id");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.TableSession", b =>
                 {
-                    b.HasOne("Servora.Domain.Models.Branch", null)
+                    b.HasOne("Servora.Domain.Models.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_table_sessions_branches_branch_id");
 
-                    b.HasOne("Servora.Domain.Models.Table", null)
+                    b.HasOne("Servora.Domain.Models.Table", "Table")
                         .WithMany()
                         .HasForeignKey("TableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_table_sessions_tables_table_id");
 
-                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_table_sessions_tenants_tenant_id");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Table");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Servora.Domain.Models.User", b =>
+                {
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_users_tenants_tenant_id");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.UserBranch", b =>
                 {
-                    b.HasOne("Servora.Domain.Models.Branch", null)
+                    b.HasOne("Servora.Domain.Models.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_branches_branches_branch_id");
 
-                    b.HasOne("Servora.Domain.Models.User", null)
+                    b.HasOne("Servora.Domain.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_branches_tenants_tenant_id");
+
+                    b.HasOne("Servora.Domain.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_branches_asp_net_users_user_id");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Tenant");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.OrderRound", b =>
