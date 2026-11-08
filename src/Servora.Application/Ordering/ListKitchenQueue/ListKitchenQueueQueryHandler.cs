@@ -36,6 +36,7 @@ public sealed class ListKitchenQueueQueryHandler(
                 item.TableName,
                 item.SessionId,
                 item.Name,
+                item.Note,
                 item.Quantity,
                 item.KitchenStatus,
                 item.OrderedAt))

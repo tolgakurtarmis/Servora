@@ -30,6 +30,7 @@ public sealed class GetTableSessionQueryHandler(
                 line.OrderRoundId,
                 line.MenuItemId,
                 line.Name,
+                line.Note,
                 line.UnitPrice,
                 line.Quantity,
                 line.UnitPrice * line.Quantity,

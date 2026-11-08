@@ -22,6 +22,7 @@ public sealed record KitchenQueueItemInfo(
     string TableName,
     Guid SessionId,
     string Name,
+    string Note,
     int Quantity,
     KitchenStatus KitchenStatus,
     DateTime OrderedAt);

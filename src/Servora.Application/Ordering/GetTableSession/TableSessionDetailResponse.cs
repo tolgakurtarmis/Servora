@@ -16,6 +16,7 @@ public sealed record TableSessionLineResponse(
     Guid OrderRoundId,
     Guid MenuItemId,
     string Name,
+    string Note,
     decimal UnitPrice,
     int Quantity,
     decimal LineTotal,

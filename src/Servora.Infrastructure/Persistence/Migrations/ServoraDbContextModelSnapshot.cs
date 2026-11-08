@@ -498,6 +498,12 @@ namespace Servora.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("name");
 
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("note");
+
                     b.Property<Guid>("OrderRoundId")
                         .HasColumnType("uuid")
                         .HasColumnName("order_round_id");

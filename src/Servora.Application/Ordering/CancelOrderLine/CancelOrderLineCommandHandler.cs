@@ -25,13 +25,20 @@ public sealed class CancelOrderLineCommandHandler(
             throw new NotFoundException("Order line was not found.");
         }
 
-        var round = await _rounds.GetByIdReadOnlyAsync(line.OrderRoundId, cancellationToken) ?? throw new NotFoundException("Order round was not found.");
+        var round = await _rounds.GetByIdReadOnlyAsync(line.OrderRoundId, cancellationToken)
+            ?? throw new NotFoundException("Order round was not found.");
 
-        var session = await _sessions.GetByIdReadOnlyAsync(round.TableSessionId, cancellationToken) ?? throw new NotFoundException("Table session was not found.");
+        var session = await _sessions.GetByIdReadOnlyAsync(round.TableSessionId, cancellationToken)
+            ?? throw new NotFoundException("Table session was not found.");
 
         if (session.Status != TableSessionStatus.Open)
         {
             throw new BusinessException("Order lines can only be cancelled on an open table session.");
+        }
+
+        if (line.KitchenStatus is KitchenStatus.Preparing or KitchenStatus.Served)
+        {
+            throw new BusinessException("Order lines that are preparing or already served cannot be cancelled.");
         }
 
         _lines.Remove(line);

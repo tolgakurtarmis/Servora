@@ -2,7 +2,7 @@ using Servora.Application.Abstractions;
 
 namespace Servora.Application.Ordering.AddOrderRound;
 
-public sealed record OrderLineInput(Guid MenuItemId, int Quantity);
+public sealed record OrderLineInput(Guid MenuItemId, int Quantity, string? Note = null);
 
 public sealed record AddOrderRoundCommand(
     Guid TenantId,

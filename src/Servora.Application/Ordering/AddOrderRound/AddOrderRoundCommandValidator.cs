@@ -22,6 +22,9 @@ public sealed class AddOrderRoundCommandValidator : AbstractValidator<AddOrderRo
         {
             line.RuleFor(item => item.MenuItemId).NotEmpty();
             line.RuleFor(item => item.Quantity).GreaterThan(0);
+            line.RuleFor(item => item.Note)
+                .MaximumLength(500)
+                .When(item => item.Note is not null);
         });
     }
 }

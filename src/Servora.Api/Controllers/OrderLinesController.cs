@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Servora.Application.Ordering.CancelOrderLine;
+using Servora.Application.Ordering.UpdateOrderLine;
 using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
@@ -12,6 +13,22 @@ public sealed class OrderLinesController : BaseController
 {
     public OrderLinesController(ISender sender) : base(sender)
     {
+    }
+
+    [HttpPut]
+    [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Waiter)}")]
+    [ProducesResponseType(typeof(UpdateOrderLineResponse), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<UpdateOrderLineResponse>> Update(
+        Guid tenantId,
+        Guid branchId,
+        Guid orderLineId,
+        UpdateOrderLineRequest request,
+        CancellationToken cancellationToken)
+    {
+        var id = await Sender.Send(
+            new UpdateOrderLineCommand(tenantId, branchId, orderLineId, request.Quantity, request.Note),
+            cancellationToken);
+        return Ok(new UpdateOrderLineResponse(id));
     }
 
     [HttpDelete]

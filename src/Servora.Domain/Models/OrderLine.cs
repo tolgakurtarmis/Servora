@@ -24,6 +24,8 @@ public sealed class OrderLine : Entity, ITenantEntity, IBranchEntity
 
     public string Name { get; set; } = string.Empty;
 
+    public string Note { get; set; } = string.Empty;
+
     public decimal UnitPrice { get; set; }
 
     public int Quantity { get; set; }

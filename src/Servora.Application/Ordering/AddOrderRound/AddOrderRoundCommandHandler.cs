@@ -43,9 +43,11 @@ public sealed class AddOrderRoundCommandHandler(
             TableSessionId = session.Id
         };
 
-        foreach (var line in request.Lines.GroupBy(item => item.MenuItemId))
+        foreach (var line in request.Lines.GroupBy(item => (
+            item.MenuItemId,
+            Note: string.IsNullOrWhiteSpace(item.Note) ? string.Empty : item.Note.Trim())))
         {
-            var menuItem = await _menuItems.GetByIdReadOnlyAsync(line.Key, cancellationToken);
+            var menuItem = await _menuItems.GetByIdReadOnlyAsync(line.Key.MenuItemId, cancellationToken);
             if (menuItem is null || menuItem.TenantId != session.TenantId || menuItem.BranchId != session.BranchId)
             {
                 throw new NotFoundException("Menu item was not found.");
@@ -62,6 +64,7 @@ public sealed class AddOrderRoundCommandHandler(
                 BranchId = session.BranchId,
                 MenuItemId = menuItem.Id,
                 Name = menuItem.Name,
+                Note = line.Key.Note,
                 UnitPrice = menuItem.Price,
                 Quantity = line.Sum(item => item.Quantity),
                 KitchenStatus = kitchenStatus

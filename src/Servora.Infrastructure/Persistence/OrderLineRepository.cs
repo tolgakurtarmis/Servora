@@ -54,6 +54,7 @@ internal sealed class OrderLineRepository : EfRepository<OrderLine>, IOrderLineR
                 line.OrderRound.TableSession.Table.Name,
                 line.OrderRound.TableSession.Id,
                 line.Name,
+                line.Note,
                 line.Quantity,
                 line.KitchenStatus,
                 line.CreateDate))

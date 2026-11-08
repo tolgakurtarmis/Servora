@@ -8,6 +8,7 @@ public sealed record KitchenQueueItemResponse(
     string TableName,
     Guid SessionId,
     string Name,
+    string Note,
     int Quantity,
     KitchenStatus KitchenStatus,
     DateTime OrderedAt);

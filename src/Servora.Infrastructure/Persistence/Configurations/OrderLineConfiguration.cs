@@ -15,6 +15,10 @@ internal sealed class OrderLineConfiguration : IEntityTypeConfiguration<OrderLin
             .HasMaxLength(200)
             .IsRequired();
 
+        builder.Property(line => line.Note)
+            .HasMaxLength(500)
+            .IsRequired();
+
         builder.Property(line => line.UnitPrice)
             .HasPrecision(18, 2)
             .IsRequired();
