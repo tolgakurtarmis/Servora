@@ -521,6 +521,82 @@ namespace Servora.Infrastructure.Persistence.Migrations
                     b.ToTable("order_rounds", (string)null);
                 });
 
+            modelBuilder.Entity("Servora.Domain.Models.Payment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("branch_id");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("create_by");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_date");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("integer")
+                        .HasColumnName("method");
+
+                    b.Property<Guid?>("ModifyBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("modify_by");
+
+                    b.Property<DateTime?>("ModifyDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modify_date");
+
+                    b.Property<Guid>("TableSessionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("table_session_id");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_payments");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("ix_payments_branch_id");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("ix_payments_is_deleted");
+
+                    b.HasIndex("TableSessionId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_payments_table_session_id")
+                        .HasFilter("\"is_deleted\" = false");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_payments_tenant_id");
+
+                    b.ToTable("payments", (string)null);
+                });
+
             modelBuilder.Entity("Servora.Domain.Models.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1106,6 +1182,30 @@ namespace Servora.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_order_rounds_tenants_tenant_id");
+                });
+
+            modelBuilder.Entity("Servora.Domain.Models.Payment", b =>
+                {
+                    b.HasOne("Servora.Domain.Models.Branch", null)
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_payments_branches_branch_id");
+
+                    b.HasOne("Servora.Domain.Models.TableSession", null)
+                        .WithMany()
+                        .HasForeignKey("TableSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_payments_table_sessions_table_session_id");
+
+                    b.HasOne("Servora.Domain.Models.Tenant", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_payments_tenants_tenant_id");
                 });
 
             modelBuilder.Entity("Servora.Domain.Models.Subscription", b =>
