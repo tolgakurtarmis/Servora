@@ -31,6 +31,10 @@ public sealed class ServoraDbContext : IdentityDbContext<User, IdentityRole<Guid
 
     public DbSet<TableSession> TableSessions => Set<TableSession>();
 
+    public DbSet<OrderRound> OrderRounds => Set<OrderRound>();
+
+    public DbSet<OrderLine> OrderLines => Set<OrderLine>();
+
     public Guid? CurrentTenantId => _currentTenant.TenantId;
 
     public Guid? CurrentBranchId => _currentTenant.BranchId;
