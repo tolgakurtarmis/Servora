@@ -6,24 +6,16 @@ using Servora.Domain.Models;
 
 namespace Servora.Application.Tables.CreateTable;
 
-public sealed class CreateTableCommandHandler : IRequestHandler<CreateTableCommand, Guid>
+public sealed class CreateTableCommandHandler(
+    IMapper mapper,
+    IAppCache cache,
+    IRepository<Branch> branches,
+    ITableRepository tables) : IRequestHandler<CreateTableCommand, Guid>
 {
-    private readonly IMapper _mapper;
-    private readonly IAppCache _cache;
-    private readonly IRepository<Branch> _branches;
-    private readonly ITableRepository _tables;
-
-    public CreateTableCommandHandler(
-        IMapper mapper,
-        IAppCache cache,
-        IRepository<Branch> branches,
-        ITableRepository tables)
-    {
-        _mapper = mapper;
-        _cache = cache;
-        _branches = branches;
-        _tables = tables;
-    }
+    private readonly IMapper _mapper = mapper;
+    private readonly IAppCache _cache = cache;
+    private readonly IRepository<Branch> _branches = branches;
+    private readonly ITableRepository _tables = tables;
 
     public async Task<Guid> Handle(CreateTableCommand request, CancellationToken cancellationToken)
     {

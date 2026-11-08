@@ -5,21 +5,14 @@ using Servora.Domain.Enums;
 
 namespace Servora.Application.Ordering.UpdateKitchenStatus;
 
-public sealed class UpdateKitchenStatusCommandHandler : IRequestHandler<UpdateKitchenStatusCommand, Guid>
+public sealed class UpdateKitchenStatusCommandHandler(
+    ICachedBranchReader branches,
+    IOrderLineRepository lines,
+    IBranchRealtime realtime) : IRequestHandler<UpdateKitchenStatusCommand, Guid>
 {
-    private readonly ICachedBranchReader _branches;
-    private readonly IOrderLineRepository _lines;
-    private readonly IBranchRealtime _realtime;
-
-    public UpdateKitchenStatusCommandHandler(
-        ICachedBranchReader branches,
-        IOrderLineRepository lines,
-        IBranchRealtime realtime)
-    {
-        _branches = branches;
-        _lines = lines;
-        _realtime = realtime;
-    }
+    private readonly ICachedBranchReader _branches = branches;
+    private readonly IOrderLineRepository _lines = lines;
+    private readonly IBranchRealtime _realtime = realtime;
 
     public async Task<Guid> Handle(UpdateKitchenStatusCommand request, CancellationToken cancellationToken)
     {

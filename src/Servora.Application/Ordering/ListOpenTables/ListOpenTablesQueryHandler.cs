@@ -4,19 +4,13 @@ using Servora.Application.Abstractions.Exceptions;
 
 namespace Servora.Application.Ordering.ListOpenTables;
 
-public sealed class ListOpenTablesQueryHandler
-    : IRequestHandler<ListOpenTablesQuery, IReadOnlyList<OpenTableResponse>>
+public sealed class ListOpenTablesQueryHandler(
+    ICachedBranchReader branches,
+    ITableSessionRepository sessions)
+        : IRequestHandler<ListOpenTablesQuery, IReadOnlyList<OpenTableResponse>>
 {
-    private readonly ICachedBranchReader _branches;
-    private readonly ITableSessionRepository _sessions;
-
-    public ListOpenTablesQueryHandler(
-        ICachedBranchReader branches,
-        ITableSessionRepository sessions)
-    {
-        _branches = branches;
-        _sessions = sessions;
-    }
+    private readonly ICachedBranchReader _branches = branches;
+    private readonly ITableSessionRepository _sessions = sessions;
 
     public async Task<IReadOnlyList<OpenTableResponse>> Handle(
         ListOpenTablesQuery request,

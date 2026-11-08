@@ -6,24 +6,16 @@ using Servora.Domain.Models;
 
 namespace Servora.Application.Ordering.OpenTableSession;
 
-public sealed class OpenTableSessionCommandHandler : IRequestHandler<OpenTableSessionCommand, Guid>
+public sealed class OpenTableSessionCommandHandler(
+    IMapper mapper,
+    IRepository<Table> tables,
+    ITableSessionRepository sessions,
+    IBranchRealtime realtime) : IRequestHandler<OpenTableSessionCommand, Guid>
 {
-    private readonly IMapper _mapper;
-    private readonly IRepository<Table> _tables;
-    private readonly ITableSessionRepository _sessions;
-    private readonly IBranchRealtime _realtime;
-
-    public OpenTableSessionCommandHandler(
-        IMapper mapper,
-        IRepository<Table> tables,
-        ITableSessionRepository sessions,
-        IBranchRealtime realtime)
-    {
-        _mapper = mapper;
-        _tables = tables;
-        _sessions = sessions;
-        _realtime = realtime;
-    }
+    private readonly IMapper _mapper = mapper;
+    private readonly IRepository<Table> _tables = tables;
+    private readonly ITableSessionRepository _sessions = sessions;
+    private readonly IBranchRealtime _realtime = realtime;
 
     public async Task<Guid> Handle(OpenTableSessionCommand request, CancellationToken cancellationToken)
     {

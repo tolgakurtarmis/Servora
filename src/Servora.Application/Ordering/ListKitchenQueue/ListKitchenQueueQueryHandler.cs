@@ -4,19 +4,13 @@ using Servora.Application.Abstractions.Exceptions;
 
 namespace Servora.Application.Ordering.ListKitchenQueue;
 
-public sealed class ListKitchenQueueQueryHandler
-    : IRequestHandler<ListKitchenQueueQuery, IReadOnlyList<KitchenQueueItemResponse>>
+public sealed class ListKitchenQueueQueryHandler(
+    ICachedBranchReader branches,
+    IOrderLineRepository lines)
+        : IRequestHandler<ListKitchenQueueQuery, IReadOnlyList<KitchenQueueItemResponse>>
 {
-    private readonly ICachedBranchReader _branches;
-    private readonly IOrderLineRepository _lines;
-
-    public ListKitchenQueueQueryHandler(
-        ICachedBranchReader branches,
-        IOrderLineRepository lines)
-    {
-        _branches = branches;
-        _lines = lines;
-    }
+    private readonly ICachedBranchReader _branches = branches;
+    private readonly IOrderLineRepository _lines = lines;
 
     public async Task<IReadOnlyList<KitchenQueueItemResponse>> Handle(
         ListKitchenQueueQuery request,

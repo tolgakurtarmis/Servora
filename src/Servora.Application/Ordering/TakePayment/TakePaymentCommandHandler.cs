@@ -6,24 +6,16 @@ using Servora.Domain.Models;
 
 namespace Servora.Application.Ordering.TakePayment;
 
-public sealed class TakePaymentCommandHandler : IRequestHandler<TakePaymentCommand, TakePaymentResult>
+public sealed class TakePaymentCommandHandler(
+    ITableSessionRepository sessions,
+    IOrderLineRepository lines,
+    IRepository<Payment> payments,
+    IBranchRealtime realtime) : IRequestHandler<TakePaymentCommand, TakePaymentResult>
 {
-    private readonly ITableSessionRepository _sessions;
-    private readonly IOrderLineRepository _lines;
-    private readonly IRepository<Payment> _payments;
-    private readonly IBranchRealtime _realtime;
-
-    public TakePaymentCommandHandler(
-        ITableSessionRepository sessions,
-        IOrderLineRepository lines,
-        IRepository<Payment> payments,
-        IBranchRealtime realtime)
-    {
-        _sessions = sessions;
-        _lines = lines;
-        _payments = payments;
-        _realtime = realtime;
-    }
+    private readonly ITableSessionRepository _sessions = sessions;
+    private readonly IOrderLineRepository _lines = lines;
+    private readonly IRepository<Payment> _payments = payments;
+    private readonly IBranchRealtime _realtime = realtime;
 
     public async Task<TakePaymentResult> Handle(TakePaymentCommand request, CancellationToken cancellationToken)
     {
