@@ -9,13 +9,13 @@ namespace Servora.Application.Ordering.AddOrderRound;
 public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundCommand, Guid>
 {
     private readonly ITableSessionRepository _sessions;
-    private readonly IRepository<Branch> _branches;
+    private readonly ICachedBranchReader _branches;
     private readonly IRepository<MenuItem> _menuItems;
     private readonly IRepository<OrderRound> _rounds;
 
     public AddOrderRoundCommandHandler(
         ITableSessionRepository sessions,
-        IRepository<Branch> branches,
+        ICachedBranchReader branches,
         IRepository<MenuItem> menuItems,
         IRepository<OrderRound> rounds)
     {
@@ -38,7 +38,7 @@ public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundC
             throw new BusinessException("Orders can only be added to an open table session.");
         }
 
-        var branch = await _branches.GetByIdAsync(session.BranchId, cancellationToken);
+        var branch = await _branches.GetAsync(session.BranchId, cancellationToken);
         if (branch is null)
         {
             throw new NotFoundException("Branch was not found.");
@@ -55,7 +55,7 @@ public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundC
 
         foreach (var line in request.Lines.GroupBy(item => item.MenuItemId))
         {
-            var menuItem = await _menuItems.GetByIdAsync(line.Key, cancellationToken);
+            var menuItem = await _menuItems.GetByIdReadOnlyAsync(line.Key, cancellationToken);
             if (menuItem is null || menuItem.TenantId != session.TenantId || menuItem.BranchId != session.BranchId)
             {
                 throw new NotFoundException("Menu item was not found.");

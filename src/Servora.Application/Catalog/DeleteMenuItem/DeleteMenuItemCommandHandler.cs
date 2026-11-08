@@ -6,10 +6,12 @@ namespace Servora.Application.Catalog.DeleteMenuItem;
 
 public sealed class DeleteMenuItemCommandHandler : IRequestHandler<DeleteMenuItemCommand, Guid>
 {
+    private readonly IAppCache _cache;
     private readonly IMenuItemRepository _menuItems;
 
-    public DeleteMenuItemCommandHandler(IMenuItemRepository menuItems)
+    public DeleteMenuItemCommandHandler(IAppCache cache, IMenuItemRepository menuItems)
     {
+        _cache = cache;
         _menuItems = menuItems;
     }
 
@@ -22,6 +24,7 @@ public sealed class DeleteMenuItemCommandHandler : IRequestHandler<DeleteMenuIte
         }
 
         _menuItems.Remove(menuItem);
+        _cache.Remove(CacheKeys.Menus(menuItem.BranchId));
         return menuItem.Id;
     }
 }

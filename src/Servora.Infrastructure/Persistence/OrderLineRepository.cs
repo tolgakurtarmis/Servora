@@ -25,6 +25,7 @@ internal sealed class OrderLineRepository : EfRepository<OrderLine>, IOrderLineR
         CancellationToken cancellationToken)
     {
         return await LinesBySession(tableSessionId)
+            .AsNoTracking()
             .OrderBy(line => line.CreateDate)
             .ThenBy(line => line.Name)
             .ToListAsync(cancellationToken);

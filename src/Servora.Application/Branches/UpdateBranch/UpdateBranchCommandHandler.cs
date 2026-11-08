@@ -6,10 +6,12 @@ namespace Servora.Application.Branches.UpdateBranch;
 
 public sealed class UpdateBranchCommandHandler : IRequestHandler<UpdateBranchCommand, Guid>
 {
+    private readonly IAppCache _cache;
     private readonly IBranchRepository _branches;
 
-    public UpdateBranchCommandHandler(IBranchRepository branches)
+    public UpdateBranchCommandHandler(IAppCache cache, IBranchRepository branches)
     {
+        _cache = cache;
         _branches = branches;
     }
 
@@ -24,6 +26,7 @@ public sealed class UpdateBranchCommandHandler : IRequestHandler<UpdateBranchCom
         branch.Name = request.Name.Trim();
         branch.UsesKitchen = request.UsesKitchen;
         branch.IsActive = request.IsActive;
+        _cache.Remove(CacheKeys.Branch(branch.Id));
         return branch.Id;
     }
 }

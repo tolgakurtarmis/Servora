@@ -19,6 +19,13 @@ internal class EfRepository<TEntity> : IRepository<TEntity>
         return _dbContext.Set<TEntity>().FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken);
     }
 
+    public Task<TEntity?> GetByIdReadOnlyAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return _dbContext.Set<TEntity>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken);
+    }
+
     public async Task AddAsync(TEntity entity, CancellationToken cancellationToken)
     {
         await _dbContext.Set<TEntity>().AddAsync(entity, cancellationToken);

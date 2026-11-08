@@ -1,22 +1,24 @@
 using MediatR;
 using Servora.Application.Abstractions;
 using Servora.Application.Abstractions.Exceptions;
-using Servora.Domain.Models;
 
 namespace Servora.Application.Tables.ListTables;
 
 public sealed class ListTablesQueryHandler
     : IRequestHandler<ListTablesQuery, IReadOnlyList<TableResponse>>
 {
-    private readonly IRepository<Branch> _branches;
+    private readonly IAppCache _cache;
+    private readonly ICachedBranchReader _branches;
     private readonly ITableRepository _tables;
     private readonly ITableSessionRepository _sessions;
 
     public ListTablesQueryHandler(
-        IRepository<Branch> branches,
+        IAppCache cache,
+        ICachedBranchReader branches,
         ITableRepository tables,
         ITableSessionRepository sessions)
     {
+        _cache = cache;
         _branches = branches;
         _tables = tables;
         _sessions = sessions;
@@ -26,13 +28,24 @@ public sealed class ListTablesQueryHandler
         ListTablesQuery request,
         CancellationToken cancellationToken)
     {
-        var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
+        var branch = await _branches.GetAsync(request.BranchId, cancellationToken);
         if (branch is null || branch.TenantId != request.TenantId)
         {
             throw new NotFoundException("Branch was not found.");
         }
 
-        var tables = await _tables.ListByBranchIdAsync(branch.Id, cancellationToken);
+        var tables = await _cache.GetOrCreateAsync(
+            CacheKeys.Tables(branch.Id),
+            CacheDurations.Tables,
+            async token =>
+            {
+                var items = await _tables.ListByBranchIdAsync(branch.Id, token);
+                return (IReadOnlyList<CachedTable>)items
+                    .Select(table => new CachedTable(table.Id, table.Name))
+                    .ToList();
+            },
+            cancellationToken);
+
         var openSessions = await _sessions.ListOpenByBranchIdAsync(branch.Id, cancellationToken);
         var openByTableId = openSessions.ToDictionary(session => session.TableId);
 

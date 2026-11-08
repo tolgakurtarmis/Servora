@@ -110,7 +110,7 @@ public sealed class CreateUserCommandHandler : IRequestHandler<CreateUserCommand
             return null;
         }
 
-        var branch = await _branches.GetByIdAsync(request.BranchId.Value, cancellationToken);
+        var branch = await _branches.GetByIdReadOnlyAsync(request.BranchId.Value, cancellationToken);
         if (branch is null || branch.TenantId != tenantId)
         {
             throw new NotFoundException("Branch was not found.");

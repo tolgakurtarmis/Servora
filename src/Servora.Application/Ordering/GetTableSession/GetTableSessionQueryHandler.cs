@@ -21,7 +21,7 @@ public sealed class GetTableSessionQueryHandler : IRequestHandler<GetTableSessio
         GetTableSessionQuery request,
         CancellationToken cancellationToken)
     {
-        var session = await _sessions.GetByIdAsync(request.TableSessionId, cancellationToken);
+        var session = await _sessions.GetByIdReadOnlyAsync(request.TableSessionId, cancellationToken);
         if (session is null || session.TenantId != request.TenantId || session.BranchId != request.BranchId)
         {
             throw new NotFoundException("Table session was not found.");

@@ -6,13 +6,16 @@ namespace Servora.Application.Tables.DeleteTable;
 
 public sealed class DeleteTableCommandHandler : IRequestHandler<DeleteTableCommand, Guid>
 {
+    private readonly IAppCache _cache;
     private readonly ITableRepository _tables;
     private readonly ITableSessionRepository _sessions;
 
     public DeleteTableCommandHandler(
+        IAppCache cache,
         ITableRepository tables,
         ITableSessionRepository sessions)
     {
+        _cache = cache;
         _tables = tables;
         _sessions = sessions;
     }
@@ -31,6 +34,7 @@ public sealed class DeleteTableCommandHandler : IRequestHandler<DeleteTableComma
         }
 
         _tables.Remove(table);
+        _cache.Remove(CacheKeys.Tables(table.BranchId));
         return table.Id;
     }
 }

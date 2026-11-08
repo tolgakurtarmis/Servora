@@ -24,7 +24,7 @@ public sealed class OpenTableSessionCommandHandler : IRequestHandler<OpenTableSe
 
     public async Task<Guid> Handle(OpenTableSessionCommand request, CancellationToken cancellationToken)
     {
-        var table = await _tables.GetByIdAsync(request.TableId, cancellationToken);
+        var table = await _tables.GetByIdReadOnlyAsync(request.TableId, cancellationToken);
         if (table is null || table.TenantId != request.TenantId || table.BranchId != request.BranchId)
         {
             throw new NotFoundException("Table was not found.");

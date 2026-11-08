@@ -44,5 +44,6 @@ internal sealed class OrderLineConfiguration : IEntityTypeConfiguration<OrderLin
         builder.HasIndex(line => line.MenuItemId);
         builder.HasIndex(line => line.BranchId);
         builder.HasIndex(line => line.TenantId);
+        builder.HasIndex(line => new { line.BranchId, line.KitchenStatus });
     }
 }

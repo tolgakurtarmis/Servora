@@ -30,13 +30,13 @@ public sealed class CancelOrderLineCommandHandler : IRequestHandler<CancelOrderL
             throw new NotFoundException("Order line was not found.");
         }
 
-        var round = await _rounds.GetByIdAsync(line.OrderRoundId, cancellationToken);
+        var round = await _rounds.GetByIdReadOnlyAsync(line.OrderRoundId, cancellationToken);
         if (round is null)
         {
             throw new NotFoundException("Order round was not found.");
         }
 
-        var session = await _sessions.GetByIdAsync(round.TableSessionId, cancellationToken);
+        var session = await _sessions.GetByIdReadOnlyAsync(round.TableSessionId, cancellationToken);
         if (session is null)
         {
             throw new NotFoundException("Table session was not found.");

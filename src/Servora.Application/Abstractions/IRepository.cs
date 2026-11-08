@@ -7,6 +7,8 @@ public interface IRepository<TEntity>
 {
     Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
+    Task<TEntity?> GetByIdReadOnlyAsync(Guid id, CancellationToken cancellationToken);
+
     Task AddAsync(TEntity entity, CancellationToken cancellationToken);
 
     void Remove(TEntity entity);

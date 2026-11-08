@@ -453,6 +453,9 @@ namespace Servora.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId")
                         .HasDatabaseName("ix_order_lines_tenant_id");
 
+                    b.HasIndex("BranchId", "KitchenStatus")
+                        .HasDatabaseName("ix_order_lines_branch_id_kitchen_status");
+
                     b.ToTable("order_lines", (string)null);
                 });
 

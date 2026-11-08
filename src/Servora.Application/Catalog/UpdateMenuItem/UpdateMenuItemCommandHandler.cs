@@ -6,10 +6,12 @@ namespace Servora.Application.Catalog.UpdateMenuItem;
 
 public sealed class UpdateMenuItemCommandHandler : IRequestHandler<UpdateMenuItemCommand, Guid>
 {
+    private readonly IAppCache _cache;
     private readonly IMenuItemRepository _menuItems;
 
-    public UpdateMenuItemCommandHandler(IMenuItemRepository menuItems)
+    public UpdateMenuItemCommandHandler(IAppCache cache, IMenuItemRepository menuItems)
     {
+        _cache = cache;
         _menuItems = menuItems;
     }
 
@@ -30,6 +32,7 @@ public sealed class UpdateMenuItemCommandHandler : IRequestHandler<UpdateMenuIte
         menuItem.Name = name;
         menuItem.Price = request.Price;
         menuItem.IsActive = request.IsActive;
+        _cache.Remove(CacheKeys.Menus(menuItem.BranchId));
         return menuItem.Id;
     }
 }

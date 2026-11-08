@@ -2,17 +2,16 @@ using MediatR;
 using Servora.Application.Abstractions;
 using Servora.Application.Abstractions.Exceptions;
 using Servora.Domain.Enums;
-using Servora.Domain.Models;
 
 namespace Servora.Application.Ordering.UpdateKitchenStatus;
 
 public sealed class UpdateKitchenStatusCommandHandler : IRequestHandler<UpdateKitchenStatusCommand, Guid>
 {
-    private readonly IRepository<Branch> _branches;
+    private readonly ICachedBranchReader _branches;
     private readonly IOrderLineRepository _lines;
 
     public UpdateKitchenStatusCommandHandler(
-        IRepository<Branch> branches,
+        ICachedBranchReader branches,
         IOrderLineRepository lines)
     {
         _branches = branches;
@@ -21,7 +20,7 @@ public sealed class UpdateKitchenStatusCommandHandler : IRequestHandler<UpdateKi
 
     public async Task<Guid> Handle(UpdateKitchenStatusCommand request, CancellationToken cancellationToken)
     {
-        var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
+        var branch = await _branches.GetAsync(request.BranchId, cancellationToken);
         if (branch is null || branch.TenantId != request.TenantId)
         {
             throw new NotFoundException("Branch was not found.");

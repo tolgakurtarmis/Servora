@@ -21,7 +21,7 @@ public sealed class ListBranchesQueryHandler : IRequestHandler<ListBranchesQuery
         ListBranchesQuery request,
         CancellationToken cancellationToken)
     {
-        var tenant = await _tenants.GetByIdAsync(request.TenantId, cancellationToken);
+        var tenant = await _tenants.GetByIdReadOnlyAsync(request.TenantId, cancellationToken);
         if (tenant is null)
         {
             throw new NotFoundException("Tenant was not found.");

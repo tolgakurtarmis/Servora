@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Servora.Application.Abstractions;
 using Servora.Domain.Models;
 using Servora.Infrastructure.Auth;
+using Servora.Infrastructure.Caching;
 using Servora.Infrastructure.Persistence;
 using Servora.Infrastructure.Tenancy;
 
@@ -19,6 +20,9 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
+        services.AddMemoryCache();
+        services.AddSingleton<IAppCache, MemoryAppCache>();
+        services.AddScoped<ICachedBranchReader, CachedBranchReader>();
         services.AddScoped<ICurrentTenant, HttpCurrentTenant>();
 
         services.AddDbContext<ServoraDbContext>(options =>

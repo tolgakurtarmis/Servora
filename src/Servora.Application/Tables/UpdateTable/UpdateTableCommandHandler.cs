@@ -6,10 +6,12 @@ namespace Servora.Application.Tables.UpdateTable;
 
 public sealed class UpdateTableCommandHandler : IRequestHandler<UpdateTableCommand, Guid>
 {
+    private readonly IAppCache _cache;
     private readonly ITableRepository _tables;
 
-    public UpdateTableCommandHandler(ITableRepository tables)
+    public UpdateTableCommandHandler(IAppCache cache, ITableRepository tables)
     {
+        _cache = cache;
         _tables = tables;
     }
 
@@ -29,6 +31,7 @@ public sealed class UpdateTableCommandHandler : IRequestHandler<UpdateTableComma
 
         table.Name = name;
         table.IsActive = request.IsActive;
+        _cache.Remove(CacheKeys.Tables(table.BranchId));
         return table.Id;
     }
 }

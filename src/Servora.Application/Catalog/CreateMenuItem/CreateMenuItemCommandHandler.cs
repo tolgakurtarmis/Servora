@@ -9,22 +9,25 @@ namespace Servora.Application.Catalog.CreateMenuItem;
 public sealed class CreateMenuItemCommandHandler : IRequestHandler<CreateMenuItemCommand, Guid>
 {
     private readonly IMapper _mapper;
+    private readonly IAppCache _cache;
     private readonly IRepository<Branch> _branches;
     private readonly IMenuItemRepository _menuItems;
 
     public CreateMenuItemCommandHandler(
         IMapper mapper,
+        IAppCache cache,
         IRepository<Branch> branches,
         IMenuItemRepository menuItems)
     {
         _mapper = mapper;
+        _cache = cache;
         _branches = branches;
         _menuItems = menuItems;
     }
 
     public async Task<Guid> Handle(CreateMenuItemCommand request, CancellationToken cancellationToken)
     {
-        var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
+        var branch = await _branches.GetByIdReadOnlyAsync(request.BranchId, cancellationToken);
         if (branch is null || branch.TenantId != request.TenantId)
         {
             throw new NotFoundException("Branch was not found.");
@@ -39,6 +42,7 @@ public sealed class CreateMenuItemCommandHandler : IRequestHandler<CreateMenuIte
         var menuItem = _mapper.Map<MenuItem>(request);
         menuItem.TenantId = branch.TenantId;
         await _menuItems.AddAsync(menuItem, cancellationToken);
+        _cache.Remove(CacheKeys.Menus(branch.Id));
 
         return menuItem.Id;
     }

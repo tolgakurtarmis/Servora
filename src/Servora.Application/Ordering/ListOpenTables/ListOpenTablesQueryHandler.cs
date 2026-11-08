@@ -1,18 +1,17 @@
 using MediatR;
 using Servora.Application.Abstractions;
 using Servora.Application.Abstractions.Exceptions;
-using Servora.Domain.Models;
 
 namespace Servora.Application.Ordering.ListOpenTables;
 
 public sealed class ListOpenTablesQueryHandler
     : IRequestHandler<ListOpenTablesQuery, IReadOnlyList<OpenTableResponse>>
 {
-    private readonly IRepository<Branch> _branches;
+    private readonly ICachedBranchReader _branches;
     private readonly ITableSessionRepository _sessions;
 
     public ListOpenTablesQueryHandler(
-        IRepository<Branch> branches,
+        ICachedBranchReader branches,
         ITableSessionRepository sessions)
     {
         _branches = branches;
@@ -23,7 +22,7 @@ public sealed class ListOpenTablesQueryHandler
         ListOpenTablesQuery request,
         CancellationToken cancellationToken)
     {
-        var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
+        var branch = await _branches.GetAsync(request.BranchId, cancellationToken);
         if (branch is null || branch.TenantId != request.TenantId)
         {
             throw new NotFoundException("Branch was not found.");

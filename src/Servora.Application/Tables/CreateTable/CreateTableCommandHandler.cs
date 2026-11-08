@@ -9,22 +9,25 @@ namespace Servora.Application.Tables.CreateTable;
 public sealed class CreateTableCommandHandler : IRequestHandler<CreateTableCommand, Guid>
 {
     private readonly IMapper _mapper;
+    private readonly IAppCache _cache;
     private readonly IRepository<Branch> _branches;
     private readonly ITableRepository _tables;
 
     public CreateTableCommandHandler(
         IMapper mapper,
+        IAppCache cache,
         IRepository<Branch> branches,
         ITableRepository tables)
     {
         _mapper = mapper;
+        _cache = cache;
         _branches = branches;
         _tables = tables;
     }
 
     public async Task<Guid> Handle(CreateTableCommand request, CancellationToken cancellationToken)
     {
-        var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
+        var branch = await _branches.GetByIdReadOnlyAsync(request.BranchId, cancellationToken);
         if (branch is null || branch.TenantId != request.TenantId)
         {
             throw new NotFoundException("Branch was not found.");
@@ -39,6 +42,7 @@ public sealed class CreateTableCommandHandler : IRequestHandler<CreateTableComma
         var table = _mapper.Map<Table>(request);
         table.TenantId = branch.TenantId;
         await _tables.AddAsync(table, cancellationToken);
+        _cache.Remove(CacheKeys.Tables(branch.Id));
 
         return table.Id;
     }
