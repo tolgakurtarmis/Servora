@@ -15,9 +15,24 @@ internal sealed class OrderLineRepository : EfRepository<OrderLine>, IOrderLineR
 
     public Task<decimal> SumBySessionIdAsync(Guid tableSessionId, CancellationToken cancellationToken)
     {
-        return _dbContext.OrderLines
-            .Where(line => _dbContext.OrderRounds.Any(round =>
-                round.Id == line.OrderRoundId && round.TableSessionId == tableSessionId))
+        return LinesBySession(tableSessionId)
             .SumAsync(line => line.UnitPrice * line.Quantity, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<OrderLine>> ListBySessionIdAsync(
+        Guid tableSessionId,
+        CancellationToken cancellationToken)
+    {
+        return await LinesBySession(tableSessionId)
+            .OrderBy(line => line.CreateDate)
+            .ThenBy(line => line.Name)
+            .ToListAsync(cancellationToken);
+    }
+
+    private IQueryable<OrderLine> LinesBySession(Guid tableSessionId)
+    {
+        return _dbContext.OrderLines.Where(line =>
+            _dbContext.OrderRounds.Any(round =>
+                round.Id == line.OrderRoundId && round.TableSessionId == tableSessionId));
     }
 }
