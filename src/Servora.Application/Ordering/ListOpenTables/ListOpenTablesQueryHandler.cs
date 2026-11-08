@@ -8,16 +8,13 @@ namespace Servora.Application.Ordering.ListOpenTables;
 public sealed class ListOpenTablesQueryHandler
     : IRequestHandler<ListOpenTablesQuery, IReadOnlyList<OpenTableResponse>>
 {
-    private readonly ICurrentTenant _currentTenant;
     private readonly IRepository<Branch> _branches;
     private readonly ITableSessionRepository _sessions;
 
     public ListOpenTablesQueryHandler(
-        ICurrentTenant currentTenant,
         IRepository<Branch> branches,
         ITableSessionRepository sessions)
     {
-        _currentTenant = currentTenant;
         _branches = branches;
         _sessions = sessions;
     }
@@ -26,11 +23,6 @@ public sealed class ListOpenTablesQueryHandler
         ListOpenTablesQuery request,
         CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only view open tables for your own tenant.");
-        }
-
         var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
         if (branch is null || branch.TenantId != request.TenantId)
         {

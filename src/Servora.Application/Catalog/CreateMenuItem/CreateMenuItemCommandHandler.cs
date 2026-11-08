@@ -9,29 +9,21 @@ namespace Servora.Application.Catalog.CreateMenuItem;
 public sealed class CreateMenuItemCommandHandler : IRequestHandler<CreateMenuItemCommand, Guid>
 {
     private readonly IMapper _mapper;
-    private readonly ICurrentTenant _currentTenant;
     private readonly IRepository<Branch> _branches;
     private readonly IMenuItemRepository _menuItems;
 
     public CreateMenuItemCommandHandler(
         IMapper mapper,
-        ICurrentTenant currentTenant,
         IRepository<Branch> branches,
         IMenuItemRepository menuItems)
     {
         _mapper = mapper;
-        _currentTenant = currentTenant;
         _branches = branches;
         _menuItems = menuItems;
     }
 
     public async Task<Guid> Handle(CreateMenuItemCommand request, CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only manage the menu of your own tenant.");
-        }
-
         var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
         if (branch is null || branch.TenantId != request.TenantId)
         {

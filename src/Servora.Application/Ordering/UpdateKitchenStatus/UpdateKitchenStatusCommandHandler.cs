@@ -8,27 +8,19 @@ namespace Servora.Application.Ordering.UpdateKitchenStatus;
 
 public sealed class UpdateKitchenStatusCommandHandler : IRequestHandler<UpdateKitchenStatusCommand, Guid>
 {
-    private readonly ICurrentTenant _currentTenant;
     private readonly IRepository<Branch> _branches;
     private readonly IOrderLineRepository _lines;
 
     public UpdateKitchenStatusCommandHandler(
-        ICurrentTenant currentTenant,
         IRepository<Branch> branches,
         IOrderLineRepository lines)
     {
-        _currentTenant = currentTenant;
         _branches = branches;
         _lines = lines;
     }
 
     public async Task<Guid> Handle(UpdateKitchenStatusCommand request, CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only update kitchen status for your own tenant.");
-        }
-
         var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
         if (branch is null || branch.TenantId != request.TenantId)
         {

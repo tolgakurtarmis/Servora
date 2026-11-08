@@ -8,18 +8,15 @@ namespace Servora.Application.Ordering.TakePayment;
 
 public sealed class TakePaymentCommandHandler : IRequestHandler<TakePaymentCommand, TakePaymentResult>
 {
-    private readonly ICurrentTenant _currentTenant;
     private readonly ITableSessionRepository _sessions;
     private readonly IOrderLineRepository _lines;
     private readonly IRepository<Payment> _payments;
 
     public TakePaymentCommandHandler(
-        ICurrentTenant currentTenant,
         ITableSessionRepository sessions,
         IOrderLineRepository lines,
         IRepository<Payment> payments)
     {
-        _currentTenant = currentTenant;
         _sessions = sessions;
         _lines = lines;
         _payments = payments;
@@ -27,11 +24,6 @@ public sealed class TakePaymentCommandHandler : IRequestHandler<TakePaymentComma
 
     public async Task<TakePaymentResult> Handle(TakePaymentCommand request, CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only take payment for your own tenant.");
-        }
-
         var session = await _sessions.GetByIdAsync(request.TableSessionId, cancellationToken);
         if (session is null || session.TenantId != request.TenantId || session.BranchId != request.BranchId)
         {

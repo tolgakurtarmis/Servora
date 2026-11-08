@@ -8,20 +8,17 @@ namespace Servora.Application.Ordering.AddOrderRound;
 
 public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundCommand, Guid>
 {
-    private readonly ICurrentTenant _currentTenant;
     private readonly ITableSessionRepository _sessions;
     private readonly IRepository<Branch> _branches;
     private readonly IRepository<MenuItem> _menuItems;
     private readonly IRepository<OrderRound> _rounds;
 
     public AddOrderRoundCommandHandler(
-        ICurrentTenant currentTenant,
         ITableSessionRepository sessions,
         IRepository<Branch> branches,
         IRepository<MenuItem> menuItems,
         IRepository<OrderRound> rounds)
     {
-        _currentTenant = currentTenant;
         _sessions = sessions;
         _branches = branches;
         _menuItems = menuItems;
@@ -30,11 +27,6 @@ public sealed class AddOrderRoundCommandHandler : IRequestHandler<AddOrderRoundC
 
     public async Task<Guid> Handle(AddOrderRoundCommand request, CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only add orders for your own tenant.");
-        }
-
         var session = await _sessions.GetByIdAsync(request.TableSessionId, cancellationToken);
         if (session is null || session.TenantId != request.TenantId || session.BranchId != request.BranchId)
         {

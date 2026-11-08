@@ -6,22 +6,15 @@ namespace Servora.Application.Catalog.UpdateMenuItem;
 
 public sealed class UpdateMenuItemCommandHandler : IRequestHandler<UpdateMenuItemCommand, Guid>
 {
-    private readonly ICurrentTenant _currentTenant;
     private readonly IMenuItemRepository _menuItems;
 
-    public UpdateMenuItemCommandHandler(ICurrentTenant currentTenant, IMenuItemRepository menuItems)
+    public UpdateMenuItemCommandHandler(IMenuItemRepository menuItems)
     {
-        _currentTenant = currentTenant;
         _menuItems = menuItems;
     }
 
     public async Task<Guid> Handle(UpdateMenuItemCommand request, CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only update the menu of your own tenant.");
-        }
-
         var menuItem = await _menuItems.GetByIdAsync(request.MenuItemId, cancellationToken);
         if (menuItem is null || menuItem.TenantId != request.TenantId || menuItem.BranchId != request.BranchId)
         {

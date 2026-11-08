@@ -7,6 +7,6 @@ public sealed record UpdateBranchCommand(
     Guid BranchId,
     string Name,
     bool UsesKitchen,
-    bool IsActive) : ICommand<Guid>;
+    bool IsActive) : ICommand<Guid>, ITenantRequest;
 
 public sealed record UpdateBranchRequest(string Name, bool UsesKitchen, bool IsActive);

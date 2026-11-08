@@ -6,16 +6,13 @@ namespace Servora.Application.Branches.ListBranches;
 
 public sealed class ListBranchesQueryHandler : IRequestHandler<ListBranchesQuery, IReadOnlyList<BranchResponse>>
 {
-    private readonly ICurrentTenant _currentTenant;
     private readonly ITenantRepository _tenants;
     private readonly IBranchRepository _branches;
 
     public ListBranchesQueryHandler(
-        ICurrentTenant currentTenant,
         ITenantRepository tenants,
         IBranchRepository branches)
     {
-        _currentTenant = currentTenant;
         _tenants = tenants;
         _branches = branches;
     }
@@ -24,11 +21,6 @@ public sealed class ListBranchesQueryHandler : IRequestHandler<ListBranchesQuery
         ListBranchesQuery request,
         CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only list branches for your own tenant.");
-        }
-
         var tenant = await _tenants.GetByIdAsync(request.TenantId, cancellationToken);
         if (tenant is null)
         {

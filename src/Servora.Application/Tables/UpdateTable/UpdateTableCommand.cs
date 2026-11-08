@@ -7,6 +7,6 @@ public sealed record UpdateTableCommand(
     Guid BranchId,
     Guid TableId,
     string Name,
-    bool IsActive) : ICommand<Guid>;
+    bool IsActive) : ICommand<Guid>, ITenantRequest;
 
 public sealed record UpdateTableRequest(string Name, bool IsActive);

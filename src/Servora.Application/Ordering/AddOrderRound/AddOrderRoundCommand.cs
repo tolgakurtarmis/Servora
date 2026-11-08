@@ -8,4 +8,4 @@ public sealed record AddOrderRoundCommand(
     Guid TenantId,
     Guid BranchId,
     Guid TableSessionId,
-    IReadOnlyList<OrderLineInput> Lines) : ICommand<Guid>;
+    IReadOnlyList<OrderLineInput> Lines) : ICommand<Guid>, ITenantRequest;

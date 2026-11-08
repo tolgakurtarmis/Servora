@@ -8,16 +8,13 @@ namespace Servora.Application.Ordering.ListKitchenQueue;
 public sealed class ListKitchenQueueQueryHandler
     : IRequestHandler<ListKitchenQueueQuery, IReadOnlyList<KitchenQueueItemResponse>>
 {
-    private readonly ICurrentTenant _currentTenant;
     private readonly IRepository<Branch> _branches;
     private readonly IOrderLineRepository _lines;
 
     public ListKitchenQueueQueryHandler(
-        ICurrentTenant currentTenant,
         IRepository<Branch> branches,
         IOrderLineRepository lines)
     {
-        _currentTenant = currentTenant;
         _branches = branches;
         _lines = lines;
     }
@@ -26,11 +23,6 @@ public sealed class ListKitchenQueueQueryHandler
         ListKitchenQueueQuery request,
         CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only view the kitchen queue for your own tenant.");
-        }
-
         var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
         if (branch is null || branch.TenantId != request.TenantId)
         {

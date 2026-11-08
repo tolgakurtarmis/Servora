@@ -6,22 +6,15 @@ namespace Servora.Application.Tables.UpdateTable;
 
 public sealed class UpdateTableCommandHandler : IRequestHandler<UpdateTableCommand, Guid>
 {
-    private readonly ICurrentTenant _currentTenant;
     private readonly ITableRepository _tables;
 
-    public UpdateTableCommandHandler(ICurrentTenant currentTenant, ITableRepository tables)
+    public UpdateTableCommandHandler(ITableRepository tables)
     {
-        _currentTenant = currentTenant;
         _tables = tables;
     }
 
     public async Task<Guid> Handle(UpdateTableCommand request, CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only update tables for your own tenant.");
-        }
-
         var table = await _tables.GetByIdAsync(request.TableId, cancellationToken);
         if (table is null || table.TenantId != request.TenantId || table.BranchId != request.BranchId)
         {

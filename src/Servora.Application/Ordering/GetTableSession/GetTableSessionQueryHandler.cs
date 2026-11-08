@@ -6,16 +6,13 @@ namespace Servora.Application.Ordering.GetTableSession;
 
 public sealed class GetTableSessionQueryHandler : IRequestHandler<GetTableSessionQuery, TableSessionDetailResponse>
 {
-    private readonly ICurrentTenant _currentTenant;
     private readonly ITableSessionRepository _sessions;
     private readonly IOrderLineRepository _lines;
 
     public GetTableSessionQueryHandler(
-        ICurrentTenant currentTenant,
         ITableSessionRepository sessions,
         IOrderLineRepository lines)
     {
-        _currentTenant = currentTenant;
         _sessions = sessions;
         _lines = lines;
     }
@@ -24,11 +21,6 @@ public sealed class GetTableSessionQueryHandler : IRequestHandler<GetTableSessio
         GetTableSessionQuery request,
         CancellationToken cancellationToken)
     {
-        if (!_currentTenant.IsPlatformAdmin && _currentTenant.TenantId != request.TenantId)
-        {
-            throw new ForbiddenException("You can only view sessions for your own tenant.");
-        }
-
         var session = await _sessions.GetByIdAsync(request.TableSessionId, cancellationToken);
         if (session is null || session.TenantId != request.TenantId || session.BranchId != request.BranchId)
         {

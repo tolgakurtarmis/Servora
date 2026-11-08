@@ -7,4 +7,4 @@ public sealed record UpdateKitchenStatusCommand(
     Guid TenantId,
     Guid BranchId,
     Guid OrderLineId,
-    KitchenStatus Status) : ICommand<Guid>;
+    KitchenStatus Status) : ICommand<Guid>, ITenantRequest;

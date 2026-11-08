@@ -8,6 +8,6 @@ public sealed record UpdateMenuItemCommand(
     Guid MenuItemId,
     string Name,
     decimal Price,
-    bool IsActive) : ICommand<Guid>;
+    bool IsActive) : ICommand<Guid>, ITenantRequest;
 
 public sealed record UpdateMenuItemRequest(string Name, decimal Price, bool IsActive);
