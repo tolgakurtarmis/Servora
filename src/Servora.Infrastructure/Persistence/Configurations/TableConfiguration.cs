@@ -29,6 +29,6 @@ internal sealed class TableConfiguration : IEntityTypeConfiguration<Table>
         builder.HasIndex(table => table.TenantId);
         builder.HasIndex(table => new { table.BranchId, table.Name })
             .IsUnique()
-            .HasFilter("\"IsDeleted\" = false");
+            .HasFilter("\"is_deleted\" = false");
     }
 }

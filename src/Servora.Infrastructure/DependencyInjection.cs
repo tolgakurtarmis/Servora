@@ -22,7 +22,8 @@ public static class DependencyInjection
         services.AddScoped<ICurrentTenant, HttpCurrentTenant>();
 
         services.AddDbContext<ServoraDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("Servora")));
+            options.UseNpgsql(configuration.GetConnectionString("Servora"))
+                .UseSnakeCaseNamingConvention());
 
         services.AddIdentityCore<User>(options =>
             {

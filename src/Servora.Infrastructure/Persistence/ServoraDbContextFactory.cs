@@ -10,6 +10,7 @@ public sealed class ServoraDbContextFactory : IDesignTimeDbContextFactory<Servor
     {
         var options = new DbContextOptionsBuilder<ServoraDbContext>()
             .UseNpgsql("Host=localhost;Port=5432;Database=servora;Username=postgres;Password=postgres")
+            .UseSnakeCaseNamingConvention()
             .Options;
 
         return new ServoraDbContext(options, new DesignTimeCurrentTenant());

@@ -23,6 +23,6 @@ internal sealed class UserBranchConfiguration : IEntityTypeConfiguration<UserBra
 
         builder.HasIndex(membership => new { membership.UserId, membership.BranchId })
             .IsUnique()
-            .HasFilter("\"IsDeleted\" = false");
+            .HasFilter("\"is_deleted\" = false");
     }
 }

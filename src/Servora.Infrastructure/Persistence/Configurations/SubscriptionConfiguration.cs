@@ -27,6 +27,6 @@ internal sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Subsc
 
         builder.HasIndex(subscription => subscription.TenantId)
             .IsUnique()
-            .HasFilter("\"IsDeleted\" = false");
+            .HasFilter("\"is_deleted\" = false");
     }
 }

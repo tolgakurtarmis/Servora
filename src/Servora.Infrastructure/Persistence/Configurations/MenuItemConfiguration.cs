@@ -33,6 +33,6 @@ internal sealed class MenuItemConfiguration : IEntityTypeConfiguration<MenuItem>
         builder.HasIndex(item => item.TenantId);
         builder.HasIndex(item => new { item.BranchId, item.Name })
             .IsUnique()
-            .HasFilter("\"IsDeleted\" = false");
+            .HasFilter("\"is_deleted\" = false");
     }
 }
