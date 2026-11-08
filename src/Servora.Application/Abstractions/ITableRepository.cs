@@ -5,4 +5,6 @@ namespace Servora.Application.Abstractions;
 public interface ITableRepository : IRepository<Table>
 {
     Task<bool> ExistsByNameAsync(Guid branchId, string name, CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<Table>> ListByBranchIdAsync(Guid branchId, CancellationToken cancellationToken);
 }

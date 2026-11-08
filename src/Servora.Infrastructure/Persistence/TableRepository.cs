@@ -19,4 +19,15 @@ internal sealed class TableRepository : EfRepository<Table>, ITableRepository
             table => table.BranchId == branchId && table.Name == name,
             cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Table>> ListByBranchIdAsync(
+        Guid branchId,
+        CancellationToken cancellationToken)
+    {
+        return await _dbContext.Tables
+            .AsNoTracking()
+            .Where(table => table.BranchId == branchId)
+            .OrderBy(table => table.Name)
+            .ToListAsync(cancellationToken);
+    }
 }

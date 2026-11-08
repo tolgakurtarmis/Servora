@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Servora.Application.Ordering.ListOpenTables;
 using Servora.Application.Tables.CreateTable;
+using Servora.Application.Tables.ListTables;
 using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
@@ -13,6 +14,18 @@ public sealed class TablesController : BaseController
 {
     public TablesController(ISender sender) : base(sender)
     {
+    }
+
+    [HttpGet]
+    [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Waiter)},{nameof(Role.Cashier)},{nameof(Role.Kitchen)}")]
+    [ProducesResponseType(typeof(IReadOnlyList<TableResponse>), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<IReadOnlyList<TableResponse>>> List(
+        Guid tenantId,
+        Guid branchId,
+        CancellationToken cancellationToken)
+    {
+        var response = await Sender.Send(new ListTablesQuery(tenantId, branchId), cancellationToken);
+        return Ok(response);
     }
 
     [HttpGet("open")]
