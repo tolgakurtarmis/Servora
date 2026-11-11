@@ -6,8 +6,6 @@ public sealed class TransferTableSessionCommandValidator : AbstractValidator<Tra
 {
     public TransferTableSessionCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

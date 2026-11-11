@@ -13,7 +13,7 @@ public sealed class CreateMenuCategoryCommandHandler(
     public async Task<Guid> Handle(CreateMenuCategoryCommand request, CancellationToken cancellationToken)
     {
         var branch = await branches.GetByIdReadOnlyAsync(request.BranchId, cancellationToken);
-        if (branch is null || branch.TenantId != request.TenantId)
+        if (branch is null)
         {
             throw new NotFoundException("Branch was not found.");
         }

@@ -23,7 +23,7 @@ public sealed class DeleteTableCommandHandler : IRequestHandler<DeleteTableComma
     public async Task<Guid> Handle(DeleteTableCommand request, CancellationToken cancellationToken)
     {
         var table = await _tables.GetByIdAsync(request.TableId, cancellationToken);
-        if (table is null || table.TenantId != request.TenantId || table.BranchId != request.BranchId)
+        if (table is null || table.BranchId != request.BranchId)
         {
             throw new NotFoundException("Table was not found.");
         }

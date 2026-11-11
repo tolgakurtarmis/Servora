@@ -10,7 +10,7 @@ public sealed class UpdateOrderLineCommandValidatorTests
     public async Task Rejects_a_non_positive_quantity()
     {
         var result = await _validator.ValidateAsync(
-            new UpdateOrderLineCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 0, null));
+            new UpdateOrderLineCommand(Guid.NewGuid(), Guid.NewGuid(), 0, null));
 
         Assert.False(result.IsValid);
     }
@@ -19,7 +19,7 @@ public sealed class UpdateOrderLineCommandValidatorTests
     public async Task Accepts_a_valid_command()
     {
         var result = await _validator.ValidateAsync(
-            new UpdateOrderLineCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 2, "az şeker"));
+            new UpdateOrderLineCommand(Guid.NewGuid(), Guid.NewGuid(), 2, "az şeker"));
 
         Assert.True(result.IsValid);
     }

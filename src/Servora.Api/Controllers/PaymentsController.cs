@@ -7,7 +7,7 @@ using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
 
-[Route("tenants/{tenantId:guid}/branches/{branchId:guid}/sessions/{sessionId:guid}/payments")]
+[Route("branches/{branchId:guid}/sessions/{sessionId:guid}/payments")]
 public sealed class PaymentsController : BaseController
 {
     public PaymentsController(ISender sender) : base(sender)
@@ -18,14 +18,13 @@ public sealed class PaymentsController : BaseController
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Cashier)}")]
     [ProducesResponseType(typeof(TakePaymentResponse), (int)HttpStatusCode.Created)]
     public async Task<ActionResult<TakePaymentResponse>> Take(
-        Guid tenantId,
         Guid branchId,
         Guid sessionId,
         TakePaymentRequest request,
         CancellationToken cancellationToken)
     {
         var result = await Sender.Send(
-            new TakePaymentCommand(tenantId, branchId, sessionId, request.Method, request.Amount),
+            new TakePaymentCommand(branchId, sessionId, request.Method, request.Amount),
             cancellationToken);
         var response = new TakePaymentResponse(
             result.Id,
@@ -33,7 +32,7 @@ public sealed class PaymentsController : BaseController
             result.Remaining,
             result.SessionClosed);
         return Created(
-            $"/tenants/{tenantId}/branches/{branchId}/sessions/{sessionId}/payments/{result.Id}",
+            $"/branches/{branchId}/sessions/{sessionId}/payments/{result.Id}",
             response);
     }
 }

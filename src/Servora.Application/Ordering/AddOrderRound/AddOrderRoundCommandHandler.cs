@@ -22,7 +22,7 @@ public sealed class AddOrderRoundCommandHandler(
     public async Task<Guid> Handle(AddOrderRoundCommand request, CancellationToken cancellationToken)
     {
         var session = await _sessions.GetByIdAsync(request.TableSessionId, cancellationToken);
-        if (session is null || session.TenantId != request.TenantId || session.BranchId != request.BranchId)
+        if (session is null || session.BranchId != request.BranchId)
         {
             throw new NotFoundException("Table session was not found.");
         }

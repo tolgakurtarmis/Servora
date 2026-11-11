@@ -10,7 +10,7 @@ public sealed class CancelTableSessionCommandValidatorTests
     public async Task Rejects_an_empty_session_id()
     {
         var result = await _validator.ValidateAsync(
-            new CancelTableSessionCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.Empty));
+            new CancelTableSessionCommand(Guid.NewGuid(), Guid.Empty));
 
         Assert.False(result.IsValid);
     }
@@ -19,7 +19,7 @@ public sealed class CancelTableSessionCommandValidatorTests
     public async Task Accepts_a_valid_command()
     {
         var result = await _validator.ValidateAsync(
-            new CancelTableSessionCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()));
+            new CancelTableSessionCommand(Guid.NewGuid(), Guid.NewGuid()));
 
         Assert.True(result.IsValid);
     }

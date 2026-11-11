@@ -20,7 +20,7 @@ public sealed class CreateTableCommandHandler(
     public async Task<Guid> Handle(CreateTableCommand request, CancellationToken cancellationToken)
     {
         var branch = await _branches.GetByIdReadOnlyAsync(request.BranchId, cancellationToken);
-        if (branch is null || branch.TenantId != request.TenantId)
+        if (branch is null)
         {
             throw new NotFoundException("Branch was not found.");
         }

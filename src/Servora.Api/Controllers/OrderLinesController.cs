@@ -8,7 +8,7 @@ using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
 
-[Route("tenants/{tenantId:guid}/branches/{branchId:guid}/order-lines/{orderLineId:guid}")]
+[Route("branches/{branchId:guid}/order-lines/{orderLineId:guid}")]
 public sealed class OrderLinesController : BaseController
 {
     public OrderLinesController(ISender sender) : base(sender)
@@ -19,14 +19,13 @@ public sealed class OrderLinesController : BaseController
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Waiter)}")]
     [ProducesResponseType(typeof(UpdateOrderLineResponse), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<UpdateOrderLineResponse>> Update(
-        Guid tenantId,
         Guid branchId,
         Guid orderLineId,
         UpdateOrderLineRequest request,
         CancellationToken cancellationToken)
     {
         var id = await Sender.Send(
-            new UpdateOrderLineCommand(tenantId, branchId, orderLineId, request.Quantity, request.Note),
+            new UpdateOrderLineCommand(branchId, orderLineId, request.Quantity, request.Note),
             cancellationToken);
         return Ok(new UpdateOrderLineResponse(id));
     }
@@ -35,12 +34,11 @@ public sealed class OrderLinesController : BaseController
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public async Task<IActionResult> Cancel(
-        Guid tenantId,
         Guid branchId,
         Guid orderLineId,
         CancellationToken cancellationToken)
     {
-        await Sender.Send(new CancelOrderLineCommand(tenantId, branchId, orderLineId), cancellationToken);
+        await Sender.Send(new CancelOrderLineCommand(branchId, orderLineId), cancellationToken);
         return NoContent();
     }
 }

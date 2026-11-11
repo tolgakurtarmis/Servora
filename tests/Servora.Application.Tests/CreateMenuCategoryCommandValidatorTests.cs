@@ -10,7 +10,7 @@ public sealed class CreateMenuCategoryCommandValidatorTests
     public async Task Rejects_an_empty_name()
     {
         var result = await _validator.ValidateAsync(
-            new CreateMenuCategoryCommand(Guid.NewGuid(), Guid.NewGuid(), "", 0));
+            new CreateMenuCategoryCommand(Guid.NewGuid(), "", 0));
 
         Assert.False(result.IsValid);
     }
@@ -19,7 +19,7 @@ public sealed class CreateMenuCategoryCommandValidatorTests
     public async Task Accepts_a_valid_command()
     {
         var result = await _validator.ValidateAsync(
-            new CreateMenuCategoryCommand(Guid.NewGuid(), Guid.NewGuid(), "Drinks", 1));
+            new CreateMenuCategoryCommand(Guid.NewGuid(), "Drinks", 1));
 
         Assert.True(result.IsValid);
     }

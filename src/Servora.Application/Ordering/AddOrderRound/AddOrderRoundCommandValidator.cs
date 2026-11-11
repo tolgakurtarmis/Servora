@@ -6,8 +6,6 @@ public sealed class AddOrderRoundCommandValidator : AbstractValidator<AddOrderRo
 {
     public AddOrderRoundCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

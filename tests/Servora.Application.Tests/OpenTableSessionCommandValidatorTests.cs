@@ -9,7 +9,7 @@ public sealed class OpenTableSessionCommandValidatorTests
     [Fact]
     public async Task Rejects_an_empty_table_id()
     {
-        var result = await _validator.ValidateAsync(new OpenTableSessionCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.Empty));
+        var result = await _validator.ValidateAsync(new OpenTableSessionCommand(Guid.NewGuid(), Guid.Empty));
 
         Assert.False(result.IsValid);
     }
@@ -18,7 +18,7 @@ public sealed class OpenTableSessionCommandValidatorTests
     public async Task Accepts_a_valid_command()
     {
         var result = await _validator.ValidateAsync(
-            new OpenTableSessionCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()));
+            new OpenTableSessionCommand(Guid.NewGuid(), Guid.NewGuid()));
 
         Assert.True(result.IsValid);
     }

@@ -11,7 +11,7 @@ public sealed class DeleteMenuCategoryCommandHandler(
     public async Task<Guid> Handle(DeleteMenuCategoryCommand request, CancellationToken cancellationToken)
     {
         var category = await categories.GetByIdAsync(request.CategoryId, cancellationToken);
-        if (category is null || category.TenantId != request.TenantId || category.BranchId != request.BranchId)
+        if (category is null || category.BranchId != request.BranchId)
         {
             throw new NotFoundException("Menu category was not found.");
         }

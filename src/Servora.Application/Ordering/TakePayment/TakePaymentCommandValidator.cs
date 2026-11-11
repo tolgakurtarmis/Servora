@@ -7,8 +7,6 @@ public sealed class TakePaymentCommandValidator : AbstractValidator<TakePaymentC
 {
     public TakePaymentCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

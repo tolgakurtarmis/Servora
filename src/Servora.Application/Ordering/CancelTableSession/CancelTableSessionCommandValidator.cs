@@ -6,8 +6,6 @@ public sealed class CancelTableSessionCommandValidator : AbstractValidator<Cance
 {
     public CancelTableSessionCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

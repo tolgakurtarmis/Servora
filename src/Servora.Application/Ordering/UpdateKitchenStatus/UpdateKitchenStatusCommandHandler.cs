@@ -17,7 +17,7 @@ public sealed class UpdateKitchenStatusCommandHandler(
     public async Task<Guid> Handle(UpdateKitchenStatusCommand request, CancellationToken cancellationToken)
     {
         var branch = await _branches.GetAsync(request.BranchId, cancellationToken);
-        if (branch is null || branch.TenantId != request.TenantId)
+        if (branch is null)
         {
             throw new NotFoundException("Branch was not found.");
         }
@@ -28,7 +28,7 @@ public sealed class UpdateKitchenStatusCommandHandler(
         }
 
         var line = await _lines.GetByIdAsync(request.OrderLineId, cancellationToken);
-        if (line is null || line.TenantId != request.TenantId || line.BranchId != request.BranchId)
+        if (line is null || line.BranchId != request.BranchId)
         {
             throw new NotFoundException("Order line was not found.");
         }

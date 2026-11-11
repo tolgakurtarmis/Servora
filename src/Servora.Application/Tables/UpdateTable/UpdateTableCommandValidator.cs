@@ -6,7 +6,7 @@ public sealed class UpdateTableCommandValidator : AbstractValidator<UpdateTableC
 {
     public UpdateTableCommandValidator()
     {
-        RuleFor(command => command.TenantId).NotEmpty();
+
         RuleFor(command => command.BranchId).NotEmpty();
         RuleFor(command => command.TableId).NotEmpty();
         RuleFor(command => command.Name).NotEmpty().MaximumLength(100);

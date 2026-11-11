@@ -6,8 +6,6 @@ public sealed class DeleteMenuCategoryCommandValidator : AbstractValidator<Delet
 {
     public DeleteMenuCategoryCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

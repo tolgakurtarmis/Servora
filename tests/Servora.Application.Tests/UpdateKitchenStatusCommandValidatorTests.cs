@@ -11,7 +11,7 @@ public sealed class UpdateKitchenStatusCommandValidatorTests
     public async Task Rejects_an_unknown_status()
     {
         var result = await _validator.ValidateAsync(
-            new UpdateKitchenStatusCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), (KitchenStatus)0));
+            new UpdateKitchenStatusCommand(Guid.NewGuid(), Guid.NewGuid(), (KitchenStatus)0));
 
         Assert.False(result.IsValid);
     }
@@ -20,9 +20,7 @@ public sealed class UpdateKitchenStatusCommandValidatorTests
     public async Task Accepts_a_valid_command()
     {
         var result = await _validator.ValidateAsync(
-            new UpdateKitchenStatusCommand(
-                Guid.NewGuid(),
-                Guid.NewGuid(),
+            new UpdateKitchenStatusCommand(Guid.NewGuid(),
                 Guid.NewGuid(),
                 KitchenStatus.Preparing));
 

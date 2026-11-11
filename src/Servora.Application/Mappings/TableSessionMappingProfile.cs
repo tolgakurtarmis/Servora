@@ -10,6 +10,7 @@ public sealed class TableSessionMappingProfile : Profile
     public TableSessionMappingProfile()
     {
         CreateMap<OpenTableSessionCommand, TableSession>()
-            .ForMember(session => session.Status, options => options.MapFrom(_ => TableSessionStatus.Open));
+            .ForMember(session => session.Status, options => options.MapFrom(_ => TableSessionStatus.Open))
+            .ForMember(session => session.TenantId, options => options.Ignore());
     }
 }

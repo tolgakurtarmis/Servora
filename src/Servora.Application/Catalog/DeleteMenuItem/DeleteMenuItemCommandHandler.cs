@@ -12,7 +12,7 @@ public sealed class DeleteMenuItemCommandHandler(IAppCache cache, IMenuItemRepos
     public async Task<Guid> Handle(DeleteMenuItemCommand request, CancellationToken cancellationToken)
     {
         var menuItem = await _menuItems.GetByIdAsync(request.MenuItemId, cancellationToken);
-        if (menuItem is null || menuItem.TenantId != request.TenantId || menuItem.BranchId != request.BranchId)
+        if (menuItem is null || menuItem.BranchId != request.BranchId)
         {
             throw new NotFoundException("Menu item was not found.");
         }

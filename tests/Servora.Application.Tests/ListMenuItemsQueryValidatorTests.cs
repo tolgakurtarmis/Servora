@@ -9,7 +9,7 @@ public sealed class ListMenuItemsQueryValidatorTests
     [Fact]
     public async Task Rejects_an_empty_branch_id()
     {
-        var result = await _validator.ValidateAsync(new ListMenuItemsQuery(Guid.NewGuid(), Guid.Empty));
+        var result = await _validator.ValidateAsync(new ListMenuItemsQuery(Guid.Empty));
 
         Assert.False(result.IsValid);
     }
@@ -17,7 +17,7 @@ public sealed class ListMenuItemsQueryValidatorTests
     [Fact]
     public async Task Accepts_a_valid_query()
     {
-        var result = await _validator.ValidateAsync(new ListMenuItemsQuery(Guid.NewGuid(), Guid.NewGuid()));
+        var result = await _validator.ValidateAsync(new ListMenuItemsQuery(Guid.NewGuid()));
 
         Assert.True(result.IsValid);
     }

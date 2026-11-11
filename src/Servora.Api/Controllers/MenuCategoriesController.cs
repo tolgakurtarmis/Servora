@@ -10,7 +10,7 @@ using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
 
-[Route("tenants/{tenantId:guid}/branches/{branchId:guid}/menu-categories")]
+[Route("branches/{branchId:guid}/menu-categories")]
 public sealed class MenuCategoriesController : BaseController
 {
     public MenuCategoriesController(ISender sender) : base(sender)
@@ -21,27 +21,25 @@ public sealed class MenuCategoriesController : BaseController
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Waiter)},{nameof(Role.Cashier)},{nameof(Role.Kitchen)}")]
     [ProducesResponseType(typeof(IReadOnlyList<MenuCategoryResponse>), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<IReadOnlyList<MenuCategoryResponse>>> List(
-        Guid tenantId,
         Guid branchId,
         CancellationToken cancellationToken)
     {
-        return Ok(await Sender.Send(new ListMenuCategoriesQuery(tenantId, branchId), cancellationToken));
+        return Ok(await Sender.Send(new ListMenuCategoriesQuery(branchId), cancellationToken));
     }
 
     [HttpPost]
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)}")]
     [ProducesResponseType(typeof(CreateMenuCategoryResponse), (int)HttpStatusCode.Created)]
     public async Task<ActionResult<CreateMenuCategoryResponse>> Create(
-        Guid tenantId,
         Guid branchId,
         CreateMenuCategoryRequest request,
         CancellationToken cancellationToken)
     {
         var categoryId = await Sender.Send(
-            new CreateMenuCategoryCommand(tenantId, branchId, request.Name, request.SortOrder),
+            new CreateMenuCategoryCommand(branchId, request.Name, request.SortOrder),
             cancellationToken);
         return Created(
-            $"/tenants/{tenantId}/branches/{branchId}/menu-categories/{categoryId}",
+            $"/branches/{branchId}/menu-categories/{categoryId}",
             new CreateMenuCategoryResponse(categoryId));
     }
 
@@ -49,7 +47,6 @@ public sealed class MenuCategoriesController : BaseController
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)}")]
     [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<Guid>> Update(
-        Guid tenantId,
         Guid branchId,
         Guid categoryId,
         UpdateMenuCategoryRequest request,
@@ -57,7 +54,6 @@ public sealed class MenuCategoriesController : BaseController
     {
         var id = await Sender.Send(
             new UpdateMenuCategoryCommand(
-                tenantId,
                 branchId,
                 categoryId,
                 request.Name,
@@ -71,12 +67,11 @@ public sealed class MenuCategoriesController : BaseController
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public async Task<IActionResult> Delete(
-        Guid tenantId,
         Guid branchId,
         Guid categoryId,
         CancellationToken cancellationToken)
     {
-        await Sender.Send(new DeleteMenuCategoryCommand(tenantId, branchId, categoryId), cancellationToken);
+        await Sender.Send(new DeleteMenuCategoryCommand(branchId, categoryId), cancellationToken);
         return NoContent();
     }
 }

@@ -6,8 +6,6 @@ public sealed class GetTableSessionQueryValidator : AbstractValidator<GetTableSe
 {
     public GetTableSessionQueryValidator()
     {
-        RuleFor(query => query.TenantId)
-            .NotEmpty();
 
         RuleFor(query => query.BranchId)
             .NotEmpty();

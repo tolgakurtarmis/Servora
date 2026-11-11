@@ -6,7 +6,7 @@ public sealed class DeleteMenuItemCommandValidator : AbstractValidator<DeleteMen
 {
     public DeleteMenuItemCommandValidator()
     {
-        RuleFor(command => command.TenantId).NotEmpty();
+
         RuleFor(command => command.BranchId).NotEmpty();
         RuleFor(command => command.MenuItemId).NotEmpty();
     }

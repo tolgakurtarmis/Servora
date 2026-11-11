@@ -6,7 +6,7 @@ public sealed class UpdateMenuItemCommandValidator : AbstractValidator<UpdateMen
 {
     public UpdateMenuItemCommandValidator()
     {
-        RuleFor(command => command.TenantId).NotEmpty();
+
         RuleFor(command => command.BranchId).NotEmpty();
         RuleFor(command => command.MenuItemId).NotEmpty();
         RuleFor(command => command.CategoryId).NotEmpty();

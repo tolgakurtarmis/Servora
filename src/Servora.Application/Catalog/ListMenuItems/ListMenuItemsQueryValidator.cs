@@ -6,8 +6,6 @@ public sealed class ListMenuItemsQueryValidator : AbstractValidator<ListMenuItem
 {
     public ListMenuItemsQueryValidator()
     {
-        RuleFor(query => query.TenantId)
-            .NotEmpty();
 
         RuleFor(query => query.BranchId)
             .NotEmpty();

@@ -7,8 +7,6 @@ public sealed class UpdateKitchenStatusCommandValidator : AbstractValidator<Upda
 {
     public UpdateKitchenStatusCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

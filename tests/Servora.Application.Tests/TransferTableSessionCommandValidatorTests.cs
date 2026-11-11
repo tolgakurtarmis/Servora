@@ -10,7 +10,7 @@ public sealed class TransferTableSessionCommandValidatorTests
     public async Task Rejects_an_empty_target_table_id()
     {
         var result = await _validator.ValidateAsync(
-            new TransferTableSessionCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.Empty));
+            new TransferTableSessionCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.Empty));
 
         Assert.False(result.IsValid);
     }
@@ -19,7 +19,7 @@ public sealed class TransferTableSessionCommandValidatorTests
     public async Task Accepts_a_valid_command()
     {
         var result = await _validator.ValidateAsync(
-            new TransferTableSessionCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()));
+            new TransferTableSessionCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()));
 
         Assert.True(result.IsValid);
     }

@@ -12,7 +12,7 @@ public sealed class UpdateBranchCommandHandler(IAppCache cache, IBranchRepositor
     public async Task<Guid> Handle(UpdateBranchCommand request, CancellationToken cancellationToken)
     {
         var branch = await _branches.GetByIdAsync(request.BranchId, cancellationToken);
-        if (branch is null || branch.TenantId != request.TenantId)
+        if (branch is null)
         {
             throw new NotFoundException("Branch was not found.");
         }

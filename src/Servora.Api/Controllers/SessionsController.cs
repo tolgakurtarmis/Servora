@@ -9,20 +9,19 @@ using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
 
-[Route("tenants/{tenantId:guid}/branches/{branchId:guid}/sessions")]
+[Route("branches/{branchId:guid}/sessions")]
 public sealed class SessionsController(ISender sender) : BaseController(sender)
 {
     [HttpGet("{sessionId:guid}")]
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Waiter)},{nameof(Role.Cashier)},{nameof(Role.Kitchen)}")]
     [ProducesResponseType(typeof(TableSessionDetailResponse), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<TableSessionDetailResponse>> Get(
-        Guid tenantId,
         Guid branchId,
         Guid sessionId,
         CancellationToken cancellationToken)
     {
         var response = await Sender.Send(
-            new GetTableSessionQuery(tenantId, branchId, sessionId),
+            new GetTableSessionQuery(branchId, sessionId),
             cancellationToken);
         return Ok(response);
     }
@@ -31,13 +30,12 @@ public sealed class SessionsController(ISender sender) : BaseController(sender)
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Waiter)}")]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     public async Task<IActionResult> Cancel(
-        Guid tenantId,
         Guid branchId,
         Guid sessionId,
         CancellationToken cancellationToken)
     {
         await Sender.Send(
-            new CancelTableSessionCommand(tenantId, branchId, sessionId),
+            new CancelTableSessionCommand(branchId, sessionId),
             cancellationToken);
         return NoContent();
     }
@@ -46,14 +44,13 @@ public sealed class SessionsController(ISender sender) : BaseController(sender)
     [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)},{nameof(Role.Waiter)}")]
     [ProducesResponseType(typeof(TransferTableSessionResponse), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<TransferTableSessionResponse>> Transfer(
-        Guid tenantId,
         Guid branchId,
         Guid sessionId,
         TransferTableSessionRequest request,
         CancellationToken cancellationToken)
     {
         await Sender.Send(
-            new TransferTableSessionCommand(tenantId, branchId, sessionId, request.TargetTableId),
+            new TransferTableSessionCommand(branchId, sessionId, request.TargetTableId),
             cancellationToken);
         return Ok(new TransferTableSessionResponse(sessionId, request.TargetTableId));
     }

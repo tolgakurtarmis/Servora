@@ -6,8 +6,6 @@ public sealed class ListKitchenQueueQueryValidator : AbstractValidator<ListKitch
 {
     public ListKitchenQueueQueryValidator()
     {
-        RuleFor(query => query.TenantId)
-            .NotEmpty();
 
         RuleFor(query => query.BranchId)
             .NotEmpty();

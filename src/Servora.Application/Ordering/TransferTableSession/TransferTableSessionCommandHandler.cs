@@ -18,7 +18,7 @@ public sealed class TransferTableSessionCommandHandler(
     public async Task<Guid> Handle(TransferTableSessionCommand request, CancellationToken cancellationToken)
     {
         var session = await _sessions.GetByIdAsync(request.TableSessionId, cancellationToken);
-        if (session is null || session.TenantId != request.TenantId || session.BranchId != request.BranchId)
+        if (session is null || session.BranchId != request.BranchId)
         {
             throw new NotFoundException("Table session was not found.");
         }
@@ -35,7 +35,6 @@ public sealed class TransferTableSessionCommandHandler(
 
         var targetTable = await _tables.GetByIdReadOnlyAsync(request.TargetTableId, cancellationToken);
         if (targetTable is null
-            || targetTable.TenantId != request.TenantId
             || targetTable.BranchId != request.BranchId)
         {
             throw new NotFoundException("Target table was not found.");

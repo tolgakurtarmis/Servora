@@ -10,7 +10,7 @@ public sealed class CancelOrderLineCommandValidatorTests
     public async Task Rejects_an_empty_order_line_id()
     {
         var result = await _validator.ValidateAsync(
-            new CancelOrderLineCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.Empty));
+            new CancelOrderLineCommand(Guid.NewGuid(), Guid.Empty));
 
         Assert.False(result.IsValid);
     }
@@ -19,7 +19,7 @@ public sealed class CancelOrderLineCommandValidatorTests
     public async Task Accepts_a_valid_command()
     {
         var result = await _validator.ValidateAsync(
-            new CancelOrderLineCommand(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()));
+            new CancelOrderLineCommand(Guid.NewGuid(), Guid.NewGuid()));
 
         Assert.True(result.IsValid);
     }

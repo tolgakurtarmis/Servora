@@ -6,8 +6,6 @@ public sealed class OpenTableSessionCommandValidator : AbstractValidator<OpenTab
 {
     public OpenTableSessionCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

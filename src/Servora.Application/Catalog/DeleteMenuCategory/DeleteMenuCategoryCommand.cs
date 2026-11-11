@@ -3,6 +3,5 @@ using Servora.Application.Abstractions;
 namespace Servora.Application.Catalog.DeleteMenuCategory;
 
 public sealed record DeleteMenuCategoryCommand(
-    Guid TenantId,
     Guid BranchId,
-    Guid CategoryId) : ICommand<Guid>, ITenantRequest;
+    Guid CategoryId) : ICommand<Guid>, IBranchRequest;

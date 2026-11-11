@@ -17,7 +17,7 @@ public sealed class ListOpenTablesQueryHandler(
         CancellationToken cancellationToken)
     {
         var branch = await _branches.GetAsync(request.BranchId, cancellationToken);
-        if (branch is null || branch.TenantId != request.TenantId)
+        if (branch is null)
         {
             throw new NotFoundException("Branch was not found.");
         }

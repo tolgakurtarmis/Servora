@@ -6,8 +6,6 @@ public sealed class CreateMenuItemCommandValidator : AbstractValidator<CreateMen
 {
     public CreateMenuItemCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

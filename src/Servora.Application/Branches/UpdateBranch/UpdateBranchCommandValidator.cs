@@ -6,7 +6,7 @@ public sealed class UpdateBranchCommandValidator : AbstractValidator<UpdateBranc
 {
     public UpdateBranchCommandValidator()
     {
-        RuleFor(command => command.TenantId).NotEmpty();
+
         RuleFor(command => command.BranchId).NotEmpty();
         RuleFor(command => command.Name).NotEmpty().MaximumLength(200);
     }

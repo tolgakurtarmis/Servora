@@ -12,14 +12,13 @@ public sealed class UpdateMenuItemCommandHandler(
     public async Task<Guid> Handle(UpdateMenuItemCommand request, CancellationToken cancellationToken)
     {
         var menuItem = await menuItems.GetByIdAsync(request.MenuItemId, cancellationToken);
-        if (menuItem is null || menuItem.TenantId != request.TenantId || menuItem.BranchId != request.BranchId)
+        if (menuItem is null || menuItem.BranchId != request.BranchId)
         {
             throw new NotFoundException("Menu item was not found.");
         }
 
         var category = await categories.GetByIdReadOnlyAsync(request.CategoryId, cancellationToken);
         if (category is null
-            || category.TenantId != request.TenantId
             || category.BranchId != request.BranchId
             || !category.IsActive)
         {

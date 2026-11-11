@@ -4,11 +4,10 @@ using Servora.Domain.Enums;
 namespace Servora.Application.Ordering.TakePayment;
 
 public sealed record TakePaymentCommand(
-    Guid TenantId,
     Guid BranchId,
     Guid TableSessionId,
     PaymentMethod Method,
-    decimal? Amount = null) : ICommand<TakePaymentResult>, ITenantRequest;
+    decimal? Amount = null) : ICommand<TakePaymentResult>, IBranchRequest;
 
 public sealed record TakePaymentResult(
     Guid Id,

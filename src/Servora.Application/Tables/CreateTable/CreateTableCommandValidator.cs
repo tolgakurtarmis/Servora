@@ -6,8 +6,6 @@ public sealed class CreateTableCommandValidator : AbstractValidator<CreateTableC
 {
     public CreateTableCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

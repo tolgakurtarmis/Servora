@@ -20,7 +20,7 @@ public sealed class CancelOrderLineCommandHandler(
     public async Task<Guid> Handle(CancelOrderLineCommand request, CancellationToken cancellationToken)
     {
         var line = await _lines.GetByIdAsync(request.OrderLineId, cancellationToken);
-        if (line is null || line.TenantId != request.TenantId || line.BranchId != request.BranchId)
+        if (line is null || line.BranchId != request.BranchId)
         {
             throw new NotFoundException("Order line was not found.");
         }

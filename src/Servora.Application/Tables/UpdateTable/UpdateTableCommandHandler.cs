@@ -18,7 +18,7 @@ public sealed class UpdateTableCommandHandler : IRequestHandler<UpdateTableComma
     public async Task<Guid> Handle(UpdateTableCommand request, CancellationToken cancellationToken)
     {
         var table = await _tables.GetByIdAsync(request.TableId, cancellationToken);
-        if (table is null || table.TenantId != request.TenantId || table.BranchId != request.BranchId)
+        if (table is null || table.BranchId != request.BranchId)
         {
             throw new NotFoundException("Table was not found.");
         }

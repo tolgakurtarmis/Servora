@@ -9,7 +9,7 @@ public sealed class CreateTableCommandValidatorTests
     [Fact]
     public async Task Rejects_empty_name()
     {
-        var result = await _validator.ValidateAsync(new CreateTableCommand(Guid.NewGuid(), Guid.NewGuid(), ""));
+        var result = await _validator.ValidateAsync(new CreateTableCommand(Guid.NewGuid(), ""));
 
         Assert.False(result.IsValid);
     }
@@ -17,7 +17,7 @@ public sealed class CreateTableCommandValidatorTests
     [Fact]
     public async Task Accepts_a_valid_command()
     {
-        var result = await _validator.ValidateAsync(new CreateTableCommand(Guid.NewGuid(), Guid.NewGuid(), "Masa 1"));
+        var result = await _validator.ValidateAsync(new CreateTableCommand(Guid.NewGuid(), "Masa 1"));
 
         Assert.True(result.IsValid);
     }

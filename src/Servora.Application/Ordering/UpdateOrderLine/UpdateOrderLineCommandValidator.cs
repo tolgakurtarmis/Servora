@@ -6,8 +6,6 @@ public sealed class UpdateOrderLineCommandValidator : AbstractValidator<UpdateOr
 {
     public UpdateOrderLineCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();

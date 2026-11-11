@@ -16,14 +16,13 @@ public sealed class CreateMenuItemCommandHandler(
     public async Task<Guid> Handle(CreateMenuItemCommand request, CancellationToken cancellationToken)
     {
         var branch = await branches.GetByIdReadOnlyAsync(request.BranchId, cancellationToken);
-        if (branch is null || branch.TenantId != request.TenantId)
+        if (branch is null)
         {
             throw new NotFoundException("Branch was not found.");
         }
 
         var category = await categories.GetByIdReadOnlyAsync(request.CategoryId, cancellationToken);
         if (category is null
-            || category.TenantId != request.TenantId
             || category.BranchId != request.BranchId
             || !category.IsActive)
         {

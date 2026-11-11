@@ -6,8 +6,6 @@ public sealed class CancelOrderLineCommandValidator : AbstractValidator<CancelOr
 {
     public CancelOrderLineCommandValidator()
     {
-        RuleFor(command => command.TenantId)
-            .NotEmpty();
 
         RuleFor(command => command.BranchId)
             .NotEmpty();
