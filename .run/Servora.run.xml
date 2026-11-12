@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="true" name="Servora" type="CompoundRunConfigurationType">
+    <toRun name="Servora.Api: http" type="LaunchSettings" />
+    <toRun name="Servora.Web: run" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>

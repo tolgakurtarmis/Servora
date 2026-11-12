@@ -11,9 +11,11 @@ public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCom
             .NotEmpty()
             .MaximumLength(200);
 
-        RuleFor(command => command.Email)
+        RuleFor(command => command.UserName)
             .NotEmpty()
-            .EmailAddress();
+            .MaximumLength(256)
+            .Matches(@"^[a-zA-Z0-9._@+-]+$")
+            .WithMessage("Username may only contain letters, digits, and . _ @ + - characters.");
 
         RuleFor(command => command.Password)
             .NotEmpty()

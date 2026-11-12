@@ -9,6 +9,11 @@ services:
       - "5432:5432"
     volumes:
       - servora-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d servora"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
 
 volumes:
   servora-postgres:

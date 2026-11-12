@@ -16,13 +16,13 @@ internal sealed class JwtAccessTokenIssuer : IAccessTokenIssuer
         _options = options.Value;
     }
 
-    public AccessToken Issue(Guid userId, string email, string role, Guid? tenantId, Guid? branchId)
+    public AccessToken Issue(Guid userId, string userName, string role, Guid? tenantId, Guid? branchId)
     {
         var expiresAt = DateTime.UtcNow.AddMinutes(_options.ExpiresMinutes);
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new(JwtRegisteredClaimNames.Email, email),
+            new(JwtRegisteredClaimNames.UniqueName, userName),
             new("role", role),
             new(ClaimTypes.Role, role)
         };

@@ -6,9 +6,9 @@ public sealed class LoginCommandValidator : AbstractValidator<LoginCommand>
 {
     public LoginCommandValidator()
     {
-        RuleFor(command => command.Email)
+        RuleFor(command => command.UserName)
             .NotEmpty()
-            .EmailAddress();
+            .MaximumLength(256);
 
         RuleFor(command => command.Password)
             .NotEmpty();

@@ -40,7 +40,7 @@ public sealed class ListUsersQueryHandler : IRequestHandler<ListUsersQuery, IRea
             .Select(user => new UserResponse(
                 user.Id,
                 user.Name,
-                user.Email ?? string.Empty,
+                user.UserName ?? string.Empty,
                 user.Role,
                 user.TenantId,
                 user.IsActive))

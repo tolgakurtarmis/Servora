@@ -35,14 +35,17 @@ public sealed class CreateUserCommandHandler : IRequestHandler<CreateUserCommand
         var tenantId = ResolveTenantId(request);
         var branchId = await ResolveBranchIdAsync(request, tenantId, cancellationToken);
 
-        var existing = await _users.FindByEmailAsync(request.Email.Trim());
+        var userName = request.UserName.Trim();
+        var existing = await _users.FindByNameAsync(userName);
         if (existing is not null)
         {
-            throw new BusinessException("A user with this email already exists.");
+            throw new BusinessException("A user with this username already exists.");
         }
 
         var user = _mapper.Map<User>(request);
         user.TenantId = tenantId;
+        user.Email = null;
+        user.EmailConfirmed = false;
 
         var created = await _users.CreateAsync(user, request.Password);
         if (!created.Succeeded)

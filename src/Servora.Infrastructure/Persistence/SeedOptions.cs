@@ -6,7 +6,7 @@ public sealed class SeedOptions
 
     public bool Enabled { get; set; }
 
-    public string PlatformAdminEmail { get; set; } = "admin@servora.local";
+    public string PlatformAdminUserName { get; set; } = "admin";
 
     public string PlatformAdminPassword { get; set; } = "Admin123!";
 }

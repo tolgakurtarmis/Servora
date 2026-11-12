@@ -51,7 +51,7 @@ public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCom
 
         var accessToken = _accessTokens.Issue(
             user.Id,
-            user.Email ?? string.Empty,
+            user.UserName ?? user.Id.ToString(),
             user.Role.ToString(),
             user.TenantId,
             branchId);

@@ -9,6 +9,8 @@ namespace Servora.Infrastructure.Persistence;
 
 public static class DatabaseSeeder
 {
+    private const string LegacyPlatformAdminEmail = "admin@servora.local";
+
     public static async Task SeedAsync(IHost host)
     {
         var environment = host.Services.GetRequiredService<IHostEnvironment>();
@@ -27,17 +29,35 @@ public static class DatabaseSeeder
         using var scope = host.Services.CreateScope();
         var users = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-        var existing = await users.FindByEmailAsync(options.PlatformAdminEmail);
+        var userName = options.PlatformAdminUserName.Trim();
+        var existing = await users.FindByNameAsync(userName);
         if (existing is not null)
         {
             return;
         }
 
+        var legacy = await users.FindByEmailAsync(LegacyPlatformAdminEmail)
+            ?? await users.FindByNameAsync(LegacyPlatformAdminEmail);
+        if (legacy is not null)
+        {
+            legacy.UserName = userName;
+            legacy.Email = null;
+            legacy.NormalizedEmail = null;
+            var updated = await users.UpdateAsync(legacy);
+            if (!updated.Succeeded)
+            {
+                var errors = string.Join(" ", updated.Errors.Select(error => error.Description));
+                throw new InvalidOperationException($"Failed to normalize platform admin username: {errors}");
+            }
+
+            return;
+        }
+
         var user = new User
         {
-            UserName = options.PlatformAdminEmail,
-            Email = options.PlatformAdminEmail,
-            EmailConfirmed = true,
+            UserName = userName,
+            Email = null,
+            EmailConfirmed = false,
             Name = "Platform Admin",
             Role = Role.PlatformAdmin
         };
