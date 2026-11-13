@@ -22,14 +22,17 @@ builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ServoraWeb", policy =>
     {
+        if (corsOrigins.Length > 0)
+        {
+            policy.WithOrigins(corsOrigins);
+        }
+
         policy
-            .WithOrigins(
-                "http://localhost:5173",
-                "https://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
