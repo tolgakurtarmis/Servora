@@ -103,6 +103,80 @@ internal sealed class OrderLineRepository : EfRepository<OrderLine>, IOrderLineR
             topProducts);
     }
 
+    public async Task<SalesRangeSummaryInfo> GetSalesRangeSummaryAsync(
+        Guid branchId,
+        DateOnly fromDate,
+        DateOnly toDate,
+        CancellationToken cancellationToken)
+    {
+        if (toDate < fromDate)
+        {
+            (fromDate, toDate) = (toDate, fromDate);
+        }
+
+        var from = fromDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+        var toExclusive = toDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc).AddDays(1);
+
+        var lines = await _dbContext.OrderLines
+            .AsNoTracking()
+            .Where(line =>
+                line.BranchId == branchId &&
+                line.CreateDate >= from &&
+                line.CreateDate < toExclusive &&
+                line.OrderRound.TableSession.Status != TableSessionStatus.Cancelled)
+            .Select(line => new
+            {
+                line.Name,
+                line.Quantity,
+                Revenue = line.UnitPrice * line.Quantity,
+                SessionId = line.OrderRound.TableSessionId,
+                line.CreateDate
+            })
+            .ToListAsync(cancellationToken);
+
+        var dayMap = lines
+            .GroupBy(line => DateOnly.FromDateTime(DateTime.SpecifyKind(line.CreateDate, DateTimeKind.Utc)))
+            .ToDictionary(
+                group => group.Key,
+                group => new SalesRangeDayInfo(
+                    group.Key,
+                    group.Sum(line => line.Revenue),
+                    group.Select(line => line.SessionId).Distinct().Count()));
+
+        var days = new List<SalesRangeDayInfo>();
+        for (var day = fromDate; day <= toDate; day = day.AddDays(1))
+        {
+            days.Add(dayMap.TryGetValue(day, out var info)
+                ? info
+                : new SalesRangeDayInfo(day, 0m, 0));
+        }
+
+        var topProducts = lines
+            .GroupBy(line => line.Name)
+            .Select(group => new DailySalesTopProductInfo(
+                group.Key,
+                group.Sum(line => line.Quantity),
+                group.Sum(line => line.Revenue)))
+            .OrderByDescending(product => product.Revenue)
+            .ThenBy(product => product.Name)
+            .Take(5)
+            .ToList();
+
+        var weakestDay = days
+            .OrderBy(day => day.TotalRevenue)
+            .ThenBy(day => day.Date)
+            .FirstOrDefault();
+
+        return new SalesRangeSummaryInfo(
+            fromDate,
+            toDate,
+            lines.Sum(line => line.Revenue),
+            lines.Select(line => line.SessionId).Distinct().Count(),
+            topProducts,
+            weakestDay,
+            days);
+    }
+
     private IQueryable<OrderLine> LinesBySession(Guid tableSessionId)
     {
         return _dbContext.OrderLines.Where(line => line.OrderRound.TableSessionId == tableSessionId);

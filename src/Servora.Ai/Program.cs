@@ -17,14 +17,22 @@ builder.Services.AddHttpClient<SalesSummaryTool>((sp, client) =>
     client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
 });
 
-// promp buradaki descriptiona göre hani tool:GetDailySalesSummaryAsync gideceğini bulur 
 builder.Services.AddScoped<AITool>(sp =>
 {
     var tool = sp.GetRequiredService<SalesSummaryTool>();
     return AIFunctionFactory.Create(
         tool.GetDailySalesSummaryAsync,
         name: "get_daily_sales_summary",
-        description: "Gets daily sales summary for the current branch from Servora.Api: total revenue, order count, and top products. Date is optional (yyyy-MM-dd); omit it for today.");
+        description: "Gets one day's sales for the current branch: total revenue, order count, and top products. Date is optional (yyyy-MM-dd); omit it for today. Use for bugün/dün or a specific day.");
+});
+
+builder.Services.AddScoped<AITool>(sp =>
+{
+    var tool = sp.GetRequiredService<SalesSummaryTool>();
+    return AIFunctionFactory.Create(
+        tool.GetWeeklySalesOverviewAsync,
+        name: "get_weekly_sales_overview",
+        description: "Gets the last 7 UTC days for the current branch: total revenue, order count, top products, weakest day (lowest revenue), and per-day breakdown. Use for bu hafta, zayıf gün, top ürünler this week.");
 });
 
 builder.Services.AddSingleton<IChatClient>(sp =>

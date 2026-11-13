@@ -19,6 +19,12 @@ public interface IOrderLineRepository : IRepository<OrderLine>
         Guid branchId,
         DateOnly date,
         CancellationToken cancellationToken);
+
+    Task<SalesRangeSummaryInfo> GetSalesRangeSummaryAsync(
+        Guid branchId,
+        DateOnly fromDate,
+        DateOnly toDate,
+        CancellationToken cancellationToken);
 }
 
 public sealed record DailySalesTopProductInfo(string Name, int Quantity, decimal Revenue);
@@ -28,6 +34,17 @@ public sealed record DailySalesSummaryInfo(
     decimal TotalRevenue,
     int OrderCount,
     IReadOnlyList<DailySalesTopProductInfo> TopProducts);
+
+public sealed record SalesRangeDayInfo(DateOnly Date, decimal TotalRevenue, int OrderCount);
+
+public sealed record SalesRangeSummaryInfo(
+    DateOnly FromDate,
+    DateOnly ToDate,
+    decimal TotalRevenue,
+    int OrderCount,
+    IReadOnlyList<DailySalesTopProductInfo> TopProducts,
+    SalesRangeDayInfo? WeakestDay,
+    IReadOnlyList<SalesRangeDayInfo> Days);
 
 public sealed record KitchenQueueItemInfo(
     Guid OrderLineId,

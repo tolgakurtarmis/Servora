@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Servora.Application.Analytics.GetDailySalesSummary;
+using Servora.Application.Analytics.GetSalesRangeSummary;
 using Servora.Domain.Enums;
 
 namespace Servora.Api.Controllers;
@@ -23,5 +24,17 @@ public sealed class AnalyticsController : BaseController
         CancellationToken cancellationToken)
     {
         return Ok(await Sender.Send(new GetDailySalesSummaryQuery(branchId, date), cancellationToken));
+    }
+
+    [HttpGet("sales-range")]
+    [Authorize(Roles = $"{nameof(Role.PlatformAdmin)},{nameof(Role.Owner)},{nameof(Role.Manager)}")]
+    [ProducesResponseType(typeof(GetSalesRangeSummaryResponse), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<GetSalesRangeSummaryResponse>> GetSalesRange(
+        Guid branchId,
+        [FromQuery] DateOnly from,
+        [FromQuery] DateOnly to,
+        CancellationToken cancellationToken)
+    {
+        return Ok(await Sender.Send(new GetSalesRangeSummaryQuery(branchId, from, to), cancellationToken));
     }
 }

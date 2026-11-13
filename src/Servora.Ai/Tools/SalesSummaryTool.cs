@@ -27,9 +27,31 @@ public sealed class SalesSummaryTool(
         }
 
         var dateValue = resolvedDate.Value.ToString("yyyy-MM-dd");
-        using var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"branches/{callContext.BranchId}/analytics/daily-sales?date={dateValue}");
+        return await SendAsync(
+            $"branches/{callContext.BranchId}/analytics/daily-sales?date={dateValue}",
+            cancellationToken);
+    }
+
+    /// <summary>
+    /// Last 7 UTC days (including today): top products and weakest day by revenue.
+    /// </summary>
+    public async Task<string> GetWeeklySalesOverviewAsync(CancellationToken cancellationToken = default)
+    {
+        if (callContext.BranchId == Guid.Empty)
+        {
+            return """{"error":"BranchId is required on the complete request."}""";
+        }
+
+        var to = DateOnly.FromDateTime(DateTime.UtcNow);
+        var from = to.AddDays(-6);
+        return await SendAsync(
+            $"branches/{callContext.BranchId}/analytics/sales-range?from={from:yyyy-MM-dd}&to={to:yyyy-MM-dd}",
+            cancellationToken);
+    }
+
+    private async Task<string> SendAsync(string relativeUrl, CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, relativeUrl);
 
         var authorization = httpContextAccessor.HttpContext?.Request.Headers.Authorization.ToString();
         if (!string.IsNullOrWhiteSpace(authorization))

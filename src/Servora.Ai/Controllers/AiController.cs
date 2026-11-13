@@ -66,11 +66,21 @@ public sealed class AiController(
         callContext.BranchId = request.BranchId;
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow).ToString("yyyy-MM-dd");
+        var systemPrompt =
+            $"""
+            Sen Servora cafe sahibi asistanısın. Bugünün UTC tarihi: {today}.
+            Kurallar:
+            - Sadece Türkçe yaz.
+            - JSON alan adlarını (totalRevenue, topProducts, weakestDay vb.) cevapta kullanma; doğal dil kullan (ciro, sipariş, en çok satan ürün, en zayıf gün).
+            - Rakamları tool sonucundan al; uydurma.
+            - Kısa ve net ol: 2-4 cümle.
+            - "bugün/dün" veya tek gün için get_daily_sales_summary çağır (bugün için date verme).
+            - "bu hafta", "zayıf gün", "en çok satan ürünler" için get_weekly_sales_overview çağır.
+            """;
+
         var response = await chatClient.GetResponseAsync(
             [
-                new ChatMessage(
-                    ChatRole.System,
-                    $"Today's UTC date is {today}. When the user says today/bugün without a date, call get_daily_sales_summary without a date argument."),
+                new ChatMessage(ChatRole.System, systemPrompt),
                 new ChatMessage(ChatRole.User, request.Prompt.Trim())
             ],
             new ChatOptions { Tools = _tools },
