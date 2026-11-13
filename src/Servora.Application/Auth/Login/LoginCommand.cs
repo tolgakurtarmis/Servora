@@ -3,4 +3,4 @@ using Servora.Application.Auth;
 
 namespace Servora.Application.Auth.Login;
 
-public sealed record LoginCommand(string Email, string Password) : ICommand<AuthResponse>;
+public sealed record LoginCommand(string UserName, string Password) : ICommand<AuthResponse>;

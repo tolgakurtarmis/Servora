@@ -35,12 +35,19 @@ public sealed class ListUsersQueryHandler : IRequestHandler<ListUsersQuery, IRea
             throw new ForbiddenException("Tenant is required.");
         }
 
-        var users = await _users.ListAsync(tenantId, cancellationToken);
+        Guid? branchId = null;
+        if (UserManagementRules.IsManager(_currentTenant))
+        {
+            branchId = _currentTenant.BranchId
+                ?? throw new ForbiddenException("The current user is not assigned to a branch.");
+        }
+
+        var users = await _users.ListAsync(tenantId, branchId, cancellationToken);
         return users
             .Select(user => new UserResponse(
                 user.Id,
                 user.Name,
-                user.Email ?? string.Empty,
+                user.UserName ?? string.Empty,
                 user.Role,
                 user.TenantId,
                 user.IsActive))

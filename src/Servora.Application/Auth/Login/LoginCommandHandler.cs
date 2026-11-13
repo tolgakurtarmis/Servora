@@ -27,12 +27,13 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResp
 
     public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var user = await _users.FindByEmailAsync(request.Email);
+        var userName = request.UserName.Trim();
+        var user = await _users.FindByNameAsync(userName);
         var passwordMatches = user is not null && await _users.CheckPasswordAsync(user, request.Password);
 
         if (user is null || !passwordMatches || !user.IsActive)
         {
-            throw new UnauthorizedException("Email or password is incorrect.");
+            throw new UnauthorizedException("Username or password is incorrect.");
         }
 
         Guid? branchId = null;
@@ -44,7 +45,7 @@ public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResp
 
         var accessToken = _accessTokens.Issue(
             user.Id,
-            user.Email ?? request.Email,
+            user.UserName ?? userName,
             user.Role.ToString(),
             user.TenantId,
             branchId);

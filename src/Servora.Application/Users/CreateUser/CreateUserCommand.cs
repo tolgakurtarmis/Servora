@@ -5,7 +5,7 @@ namespace Servora.Application.Users.CreateUser;
 
 public sealed record CreateUserCommand(
     string Name,
-    string Email,
+    string UserName,
     string Password,
     Role Role,
     Guid? TenantId,

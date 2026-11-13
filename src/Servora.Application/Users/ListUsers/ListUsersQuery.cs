@@ -8,7 +8,7 @@ public sealed record ListUsersQuery(Guid? TenantId) : IQuery<IReadOnlyList<UserR
 public sealed record UserResponse(
     Guid Id,
     string Name,
-    string Email,
+    string UserName,
     Role Role,
     Guid? TenantId,
     bool IsActive);

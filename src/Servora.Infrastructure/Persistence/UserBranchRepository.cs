@@ -20,4 +20,12 @@ internal sealed class UserBranchRepository : EfRepository<UserBranch>, IUserBran
             .OrderBy(membership => membership.CreateDate)
             .FirstOrDefaultAsync(cancellationToken);
     }
+
+    public Task<bool> ExistsAsync(Guid userId, Guid branchId, CancellationToken cancellationToken)
+    {
+        return _dbContext.Set<UserBranch>()
+            .AnyAsync(
+                membership => membership.UserId == userId && membership.BranchId == branchId,
+                cancellationToken);
+    }
 }

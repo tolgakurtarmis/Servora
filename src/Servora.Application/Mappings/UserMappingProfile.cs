@@ -10,8 +10,8 @@ public sealed class UserMappingProfile : Profile
     {
         CreateMap<CreateUserCommand, User>()
             .ForMember(user => user.Name, options => options.MapFrom(command => command.Name.Trim()))
-            .ForMember(user => user.Email, options => options.MapFrom(command => command.Email.Trim()))
-            .ForMember(user => user.UserName, options => options.MapFrom(command => command.Email.Trim()))
+            .ForMember(user => user.UserName, options => options.MapFrom(command => command.UserName.Trim()))
+            .ForMember(user => user.Email, options => options.Ignore())
             .ForMember(user => user.TenantId, options => options.Ignore());
     }
 }
