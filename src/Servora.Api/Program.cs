@@ -22,18 +22,6 @@ builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("ServoraWeb", policy =>
-    {
-        policy
-            .WithOrigins(
-                "http://localhost:5173",
-                "https://localhost:5173")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
 
 var app = builder.Build();
 
@@ -49,7 +37,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("ServoraWeb");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHealthChecks("/health");

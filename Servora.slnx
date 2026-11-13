@@ -4,9 +4,6 @@
     <Project Path="src/Servora.Application/Servora.Application.csproj" />
     <Project Path="src/Servora.Domain/Servora.Domain.csproj" />
     <Project Path="src/Servora.Infrastructure/Servora.Infrastructure.csproj" />
-    <Project Path="src/Servora.Web/Servora.Web.esproj">
-      <Build Solution="*|*" Project="false" />
-    </Project>
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Servora.Application.Tests/Servora.Application.Tests.csproj" />
