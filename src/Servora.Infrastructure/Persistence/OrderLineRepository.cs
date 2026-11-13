@@ -61,6 +61,48 @@ internal sealed class OrderLineRepository : EfRepository<OrderLine>, IOrderLineR
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<DailySalesSummaryInfo> GetDailySalesSummaryAsync(
+        Guid branchId,
+        DateOnly date,
+        CancellationToken cancellationToken)
+    {
+        var from = date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+        var to = from.AddDays(1);
+
+        var lines = await _dbContext.OrderLines
+            .AsNoTracking()
+            .Where(line =>
+                line.BranchId == branchId &&
+                line.CreateDate >= from &&
+                line.CreateDate < to &&
+                line.OrderRound.TableSession.Status != TableSessionStatus.Cancelled)
+            .Select(line => new
+            {
+                line.Name,
+                line.Quantity,
+                Revenue = line.UnitPrice * line.Quantity,
+                SessionId = line.OrderRound.TableSessionId
+            })
+            .ToListAsync(cancellationToken);
+
+        var topProducts = lines
+            .GroupBy(line => line.Name)
+            .Select(group => new DailySalesTopProductInfo(
+                group.Key,
+                group.Sum(line => line.Quantity),
+                group.Sum(line => line.Revenue)))
+            .OrderByDescending(product => product.Revenue)
+            .ThenBy(product => product.Name)
+            .Take(5)
+            .ToList();
+
+        return new DailySalesSummaryInfo(
+            date,
+            lines.Sum(line => line.Revenue),
+            lines.Select(line => line.SessionId).Distinct().Count(),
+            topProducts);
+    }
+
     private IQueryable<OrderLine> LinesBySession(Guid tableSessionId)
     {
         return _dbContext.OrderLines.Where(line => line.OrderRound.TableSessionId == tableSessionId);

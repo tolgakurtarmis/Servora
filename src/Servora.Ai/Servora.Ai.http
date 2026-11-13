@@ -1,4 +1,6 @@
 @Servora.Ai_HostAddress = http://localhost:5238
+@branchId = 00000000-0000-0000-0000-000000000000
+@token = replace-with-jwt
 
 GET {{Servora.Ai_HostAddress}}/health
 Accept: application/json
@@ -12,7 +14,9 @@ Accept: application/json
 
 POST {{Servora.Ai_HostAddress}}/ai/complete
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-  "prompt": "Bir cafe sahibi icin tek cumlelik gunluk ozet yaz."
+  "prompt": "2026-11-13 satış özetini getir ve kısaca yorumla",
+  "branchId": "{{branchId}}"
 }

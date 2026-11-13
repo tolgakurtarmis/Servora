@@ -14,7 +14,20 @@ public interface IOrderLineRepository : IRepository<OrderLine>
     Task<IReadOnlyList<KitchenQueueItemInfo>> ListKitchenQueueByBranchIdAsync(
         Guid branchId,
         CancellationToken cancellationToken);
+
+    Task<DailySalesSummaryInfo> GetDailySalesSummaryAsync(
+        Guid branchId,
+        DateOnly date,
+        CancellationToken cancellationToken);
 }
+
+public sealed record DailySalesTopProductInfo(string Name, int Quantity, decimal Revenue);
+
+public sealed record DailySalesSummaryInfo(
+    DateOnly Date,
+    decimal TotalRevenue,
+    int OrderCount,
+    IReadOnlyList<DailySalesTopProductInfo> TopProducts);
 
 public sealed record KitchenQueueItemInfo(
     Guid OrderLineId,
