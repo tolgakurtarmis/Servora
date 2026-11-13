@@ -17,10 +17,31 @@ builder.Services.AddHttpClient<SalesSummaryTool>((sp, client) =>
     client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + "/");
 });
 
+builder.Services.AddScoped<AITool>(sp =>
+{
+    var tool = sp.GetRequiredService<SalesSummaryTool>();
+    return AIFunctionFactory.Create(
+        tool.GetDailySalesSummaryAsync,
+        name: "get_daily_sales_summary",
+        description: "Gets one day's sales for the current branch: total revenue, order count, and top products. Date is optional (yyyy-MM-dd); omit it for today. Use for bugün/dün, bugün ne satıldı, en çok satan ürün today.");
+});
+
+builder.Services.AddScoped<AITool>(sp =>
+{
+    var tool = sp.GetRequiredService<SalesSummaryTool>();
+    return AIFunctionFactory.Create(
+        tool.GetWeeklySalesOverviewAsync,
+        name: "get_weekly_sales_overview",
+        description: "Gets the last 7 UTC days for the current branch: total revenue, order count, top products, weakest day, and per-day breakdown. Use for bu hafta, en çok ne satmışım, zayıf gün, top ürünler.");
+});
+
 builder.Services.AddSingleton<IChatClient>(sp =>
 {
     var options = sp.GetRequiredService<IOptions<OllamaOptions>>().Value;
-    return new OllamaApiClient(new Uri(options.BaseUrl), options.ChatModel);
+    IChatClient client = new OllamaApiClient(new Uri(options.BaseUrl), options.ChatModel);
+    return new ChatClientBuilder(client)
+        .UseFunctionInvocation()
+        .Build();
 });
 
 builder.Services.AddControllers();

@@ -3,12 +3,21 @@
 @token = replace-with-jwt
 
 GET {{Servora.Ai_HostAddress}}/health
-Accept: application/json
 
 ###
 
 GET {{Servora.Ai_HostAddress}}/ai/status
-Accept: application/json
+
+###
+
+POST {{Servora.Ai_HostAddress}}/ai/complete
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "prompt": "Bu hafta en cok ne satmisim?",
+  "branchId": "{{branchId}}"
+}
 
 ###
 
