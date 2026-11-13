@@ -3,6 +3,7 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Options;
 using Servora.Ai.Contracts;
 using Servora.Ai.Options;
+using Servora.Ai.Services;
 using Servora.Ai.Tools;
 
 namespace Servora.Ai.Controllers;
@@ -12,11 +13,10 @@ namespace Servora.Ai.Controllers;
 public sealed class AiController(
     IChatClient chatClient,
     IOptions<OllamaOptions> ollamaOptions,
-    IEnumerable<AITool> tools,
-    AiCallContext callContext) : ControllerBase
+    AiCallContext callContext,
+    SalesSummaryTool salesSummaryTool) : ControllerBase
 {
     private readonly OllamaOptions _options = ollamaOptions.Value;
-    private readonly List<AITool> _tools = tools.ToList();
 
     [HttpGet("status")]
     public async Task<IActionResult> Status(CancellationToken cancellationToken)
@@ -48,16 +48,11 @@ public sealed class AiController(
         }
     }
 
-    [HttpPost("complete")]
-    public async Task<ActionResult<CompleteResponse>> Complete(
-        [FromBody] CompleteRequest request,
+    [HttpPost("manager-advice")]
+    public async Task<ActionResult<ManagerAdviceResponse>> ManagerAdvice(
+        [FromBody] ManagerAdviceRequest request,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Prompt))
-        {
-            return BadRequest(new { error = "Prompt is required." });
-        }
-
         if (request.BranchId == Guid.Empty)
         {
             return BadRequest(new { error = "BranchId is required." });
@@ -65,27 +60,37 @@ public sealed class AiController(
 
         callContext.BranchId = request.BranchId;
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow).ToString("yyyy-MM-dd");
-        var systemPrompt =
+        var salesJson = await salesSummaryTool.GetWeeklySalesOverviewAsync(cancellationToken);
+        var facts = ManagerAdviceComposer.TryParseFacts(salesJson);
+        if (facts is null)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, new
+            {
+                error = "Could not load sales facts from Servora.Api.",
+                detail = salesJson
+            });
+        }
+
+        var focus = string.IsNullOrWhiteSpace(request.Focus)
+            ? "Genel şube performansı için öner."
+            : request.Focus.Trim();
+
+        var userMessage =
             $"""
-            Sen Servora cafe sahibi asistanısın. Bugünün UTC tarihi: {today}.
-            Kurallar:
-            - Sadece Türkçe yaz.
-            - JSON alan adlarını (totalRevenue, topProducts, weakestDay vb.) cevapta kullanma; doğal dil kullan (ciro, sipariş, en çok satan ürün, en zayıf gün).
-            - Rakamları tool sonucundan al; uydurma.
-            - Kısa ve net ol: 2-4 cümle.
-            - "bugün/dün" veya tek gün için get_daily_sales_summary çağır (bugün için date verme).
-            - "bu hafta", "zayıf gün", "en çok satan ürünler" için get_weekly_sales_overview çağır.
+            Aşağıdaki gerçeklere göre yöneticiye 3 aksiyon önerisi yaz.
+            Odak: {focus}
+
+            Gerçekler:
+            {ManagerAdviceComposer.BuildFactsBlock(facts)}
             """;
 
         var response = await chatClient.GetResponseAsync(
             [
-                new ChatMessage(ChatRole.System, systemPrompt),
-                new ChatMessage(ChatRole.User, request.Prompt.Trim())
+                new ChatMessage(ChatRole.System, ManagerAdviceComposer.BuildSystemPrompt()),
+                new ChatMessage(ChatRole.User, userMessage)
             ],
-            new ChatOptions { Tools = _tools },
-            cancellationToken);
+            cancellationToken: cancellationToken);
 
-        return Ok(new CompleteResponse(response.Text, _options.ChatModel));
+        return Ok(new ManagerAdviceResponse(response.Text, _options.ChatModel, facts));
     }
 }

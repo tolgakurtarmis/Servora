@@ -5,53 +5,18 @@ public sealed class SalesSummaryTool(
     AiCallContext callContext,
     IHttpContextAccessor httpContextAccessor)
 {
-    public async Task<string> GetDailySalesSummaryAsync(
-        string? date = null,
-        CancellationToken cancellationToken = default)
-    {
-        if (callContext.BranchId == Guid.Empty)
-        {
-            return """{"error":"BranchId is required on the complete request."}""";
-        }
-
-        // CreateDate in Api is UTC; "today" must use the UTC calendar day.
-        var resolvedDate = string.IsNullOrWhiteSpace(date)
-            ? DateOnly.FromDateTime(DateTime.UtcNow)
-            : DateOnly.TryParse(date, out var parsed)
-                ? parsed
-                : (DateOnly?)null;
-
-        if (resolvedDate is null)
-        {
-            return """{"error":"date must be yyyy-MM-dd when provided."}""";
-        }
-
-        var dateValue = resolvedDate.Value.ToString("yyyy-MM-dd");
-        return await SendAsync(
-            $"branches/{callContext.BranchId}/analytics/daily-sales?date={dateValue}",
-            cancellationToken);
-    }
-
-    /// <summary>
-    /// Last 7 UTC days (including today): top products and weakest day by revenue.
-    /// </summary>
     public async Task<string> GetWeeklySalesOverviewAsync(CancellationToken cancellationToken = default)
     {
         if (callContext.BranchId == Guid.Empty)
         {
-            return """{"error":"BranchId is required on the complete request."}""";
+            return """{"error":"BranchId is required."}""";
         }
 
         var to = DateOnly.FromDateTime(DateTime.UtcNow);
         var from = to.AddDays(-6);
-        return await SendAsync(
-            $"branches/{callContext.BranchId}/analytics/sales-range?from={from:yyyy-MM-dd}&to={to:yyyy-MM-dd}",
-            cancellationToken);
-    }
-
-    private async Task<string> SendAsync(string relativeUrl, CancellationToken cancellationToken)
-    {
-        using var request = new HttpRequestMessage(HttpMethod.Get, relativeUrl);
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"branches/{callContext.BranchId}/analytics/sales-range?from={from:yyyy-MM-dd}&to={to:yyyy-MM-dd}");
 
         var authorization = httpContextAccessor.HttpContext?.Request.Headers.Authorization.ToString();
         if (!string.IsNullOrWhiteSpace(authorization))
