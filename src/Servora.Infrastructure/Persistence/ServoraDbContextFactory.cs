@@ -18,9 +18,13 @@ public sealed class ServoraDbContextFactory : IDesignTimeDbContextFactory<Servor
 
     private sealed class DesignTimeCurrentTenant : ICurrentTenant
     {
+        public Guid? UserId => null;
+
         public Guid? TenantId => null;
 
         public Guid? BranchId => null;
+
+        public string? Role => "PlatformAdmin";
 
         public bool IsPlatformAdmin => true;
     }

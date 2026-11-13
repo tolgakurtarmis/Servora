@@ -32,8 +32,15 @@ public sealed class CreateUserCommandHandler : IRequestHandler<CreateUserCommand
 
     public async Task<Guid> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
+        UserManagementRules.EnsureCanAssignRole(_currentTenant, request.Role);
+
         var tenantId = ResolveTenantId(request);
         var branchId = await ResolveBranchIdAsync(request, tenantId, cancellationToken);
+
+        if (UserManagementRules.IsManager(_currentTenant) && branchId is null)
+        {
+            throw new BusinessException("Branch is required when a manager creates a user.");
+        }
 
         var userName = request.UserName.Trim();
         var existing = await _users.FindByNameAsync(userName);
@@ -108,12 +115,26 @@ public sealed class CreateUserCommandHandler : IRequestHandler<CreateUserCommand
         Guid? tenantId,
         CancellationToken cancellationToken)
     {
-        if (request.BranchId is null)
+        var branchId = request.BranchId;
+
+        if (branchId is null && UserManagementRules.IsManager(_currentTenant))
+        {
+            branchId = _currentTenant.BranchId;
+        }
+
+        if (branchId is null)
         {
             return null;
         }
 
-        var branch = await _branches.GetByIdReadOnlyAsync(request.BranchId.Value, cancellationToken);
+        if (UserManagementRules.IsManager(_currentTenant)
+            && _currentTenant.BranchId is not null
+            && branchId != _currentTenant.BranchId)
+        {
+            throw new ForbiddenException("You can only create users for your own branch.");
+        }
+
+        var branch = await _branches.GetByIdReadOnlyAsync(branchId.Value, cancellationToken);
         if (branch is null || branch.TenantId != tenantId)
         {
             throw new NotFoundException("Branch was not found.");

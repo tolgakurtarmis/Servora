@@ -13,13 +13,23 @@ internal sealed class UserQueryRepository : IUserQueryRepository
         _dbContext = dbContext;
     }
 
-    public async Task<IReadOnlyList<User>> ListAsync(Guid? tenantId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<User>> ListAsync(
+        Guid? tenantId,
+        Guid? branchId,
+        CancellationToken cancellationToken)
     {
         var query = _dbContext.Users.AsNoTracking().AsQueryable();
 
         if (tenantId is not null)
         {
             query = query.Where(user => user.TenantId == tenantId);
+        }
+
+        if (branchId is not null)
+        {
+            query = query.Where(user =>
+                _dbContext.Set<UserBranch>().Any(membership =>
+                    membership.UserId == user.Id && membership.BranchId == branchId));
         }
 
         return await query

@@ -8,7 +8,8 @@ import {
   type ReactNode,
 } from 'react';
 import * as authApi from '@/api/authApi';
-import type { AuthResponse, LoginRequest } from '@/api/types';
+import type { AuthResponse, LoginRequest, Role } from '@/api/types';
+import { parseAccessTokenClaims } from './jwt';
 import { clearAuth, loadAuth, saveAuth, type StoredAuth } from './tokenStorage';
 
 const REFRESH_SKEW_MS = 60_000;
@@ -16,6 +17,10 @@ const REFRESH_SKEW_MS = 60_000;
 type AuthContextValue = {
   auth: StoredAuth | null;
   isAuthenticated: boolean;
+  role: Role | null;
+  userId: string | null;
+  tenantId: string | null;
+  branchId: string | null;
   login: (request: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   getAccessToken: () => Promise<string>;
@@ -44,6 +49,25 @@ function isExpired(expiresAt: string, skewMs = 0): boolean {
   }
 
   return expiresMs <= Date.now() + skewMs;
+}
+
+function claimsFromAuth(auth: StoredAuth | null) {
+  if (!auth?.accessToken) {
+    return {
+      role: null as Role | null,
+      userId: null as string | null,
+      tenantId: null as string | null,
+      branchId: null as string | null,
+    };
+  }
+
+  const claims = parseAccessTokenClaims(auth.accessToken);
+  return {
+    role: claims?.role ?? null,
+    userId: claims?.userId ?? null,
+    tenantId: claims?.tenantId ?? null,
+    branchId: claims?.branchId ?? null,
+  };
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -118,16 +142,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return refreshPromiseRef.current;
   }, [setAuth]);
 
+  const claims = useMemo(() => claimsFromAuth(auth), [auth]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       auth,
       isAuthenticated: Boolean(auth?.accessToken),
+      role: claims.role,
+      userId: claims.userId,
+      tenantId: claims.tenantId,
+      branchId: claims.branchId,
       login,
       logout,
       getAccessToken,
       setAuth,
     }),
-    [auth, login, logout, getAccessToken, setAuth],
+    [auth, claims, login, logout, getAccessToken, setAuth],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

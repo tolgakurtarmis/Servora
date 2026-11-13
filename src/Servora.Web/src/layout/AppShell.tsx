@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
+import { Sidebar } from '@/layout/Sidebar';
 import { useTheme } from '@/theme';
 
 function SunIcon() {
@@ -41,9 +42,14 @@ function MoonIcon() {
 type AppShellProps = {
   children: ReactNode;
   contentClassName?: string;
+  showSidebar?: boolean;
 };
 
-export function AppShell({ children, contentClassName = 'content' }: AppShellProps) {
+export function AppShell({
+  children,
+  contentClassName = 'content',
+  showSidebar = false,
+}: AppShellProps) {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
   const { themeName, setThemeName } = useTheme();
@@ -51,7 +57,7 @@ export function AppShell({ children, contentClassName = 'content' }: AppShellPro
   return (
     <div className="app-shell">
       <header className="topbar">
-        <Link to="/" className="topbar-brand">
+        <Link to={isAuthenticated ? '/masa-takip' : '/'} className="topbar-brand">
           Servora
         </Link>
         <nav>
@@ -84,7 +90,10 @@ export function AppShell({ children, contentClassName = 'content' }: AppShellPro
         </nav>
       </header>
 
-      <main className={contentClassName}>{children}</main>
+      <div className={`app-body${showSidebar ? ' has-sidebar' : ''}`}>
+        {showSidebar ? <Sidebar /> : null}
+        <main className={contentClassName}>{children}</main>
+      </div>
     </div>
   );
 }
