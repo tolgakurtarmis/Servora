@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Servora.Ai/Servora.Ai.csproj" />
     <Project Path="src/Servora.Api/Servora.Api.csproj" />
     <Project Path="src/Servora.Application/Servora.Application.csproj" />
     <Project Path="src/Servora.Domain/Servora.Domain.csproj" />

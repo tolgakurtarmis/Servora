@@ -1,0 +1,18 @@
+@Servora.Ai_HostAddress = http://localhost:5238
+
+GET {{Servora.Ai_HostAddress}}/health
+Accept: application/json
+
+###
+
+GET {{Servora.Ai_HostAddress}}/ai/status
+Accept: application/json
+
+###
+
+POST {{Servora.Ai_HostAddress}}/ai/complete
+Content-Type: application/json
+
+{
+  "prompt": "Bir cafe sahibi icin tek cumlelik gunluk ozet yaz."
+}
